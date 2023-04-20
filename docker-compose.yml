@@ -1,0 +1,23 @@
+
+version: '2'
+
+services:
+  phoenix:
+    build: .
+    volumes:
+      - ./data:/data
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    tty: true
+  db:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+
