@@ -43,7 +43,7 @@ jobs:
           mix deps.compile
 
       - run: ls
-        if: steps.install.outcome == "success"
+        if: steps.install.outcome == 'success'
           
   mix-test:
     needs: dependencies
