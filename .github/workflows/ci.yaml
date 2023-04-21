@@ -1,5 +1,9 @@
 on: pull_request
 
+defaults:
+  run:
+    working-directory: data/hello
+
 jobs:
   dependencies:
     runs-on: ubuntu-latest
