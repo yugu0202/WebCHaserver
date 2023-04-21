@@ -69,6 +69,8 @@ jobs:
             deps
             _build
           key: ${{ runner.os }}-mix-${{ hashFiles('mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
 
 
       - run: mix test --trace --slowest 10
