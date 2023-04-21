@@ -21,7 +21,9 @@ jobs:
           elixir-version: ${{ matrix.elixir }}
           otp-version: ${{ matrix.otp }}
 
-      - run: pwd
+      - run: |
+        mkdir deps
+        mkdir _build
 
       - name: Cache
         id: mix-cache
@@ -42,12 +44,6 @@ jobs:
           mix local.hex --force
           mix deps.get
           mix deps.compile
-
-      - run: pwd
-        if: steps.install.outcome == 'success'
-
-      - run: ls
-        if: steps.install.outcome == 'success'
           
   mix-test:
     needs: dependencies
