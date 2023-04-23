@@ -1,8 +1,11 @@
 on: pull_request
 
+env:
+  PROJECT_NAME: hello
+
 defaults:
   run:
-    working-directory: data/hello
+    working-directory: data/${{ PROJECT_NAME }}
 
 jobs:
   dependencies:
@@ -21,13 +24,16 @@ jobs:
           elixir-version: ${{ matrix.elixir }}
           otp-version: ${{ matrix.otp }}
 
+
+      - runs: echo $GITHUB_WORKSPACE
+
       - name: Cache
         id: mix-cache
         uses: actions/cache@v3
         with:
           path: |
-            /home/runner/work/WebCHaserver/WebCHaserver/data/hello/deps
-            /home/runner/work/WebCHaserver/WebCHaserver/data/hello/_build
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/deps
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/_build
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-
@@ -69,8 +75,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /home/runner/work/WebCHaserver/WebCHaserver/data/hello/deps
-            /home/runner/work/WebCHaserver/WebCHaserver/data/hello/_build
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/deps
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/_build
           key: ${{ runner.os }}-mix-${{ hashFiles('mix.lock') }}
 
       - run: mix test --trace --slowest 10
