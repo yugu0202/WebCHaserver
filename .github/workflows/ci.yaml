@@ -25,7 +25,7 @@ jobs:
           otp-version: ${{ matrix.otp }}
 
 
-      - runs: echo $GITHUB_WORKSPACE
+      - run: echo $GITHUB_WORKSPACE
 
       - name: Cache
         id: mix-cache
