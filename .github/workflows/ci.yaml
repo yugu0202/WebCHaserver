@@ -5,7 +5,7 @@ env:
 
 defaults:
   run:
-    working-directory: data/${{ env.PROJECT_NAME }}
+    working-directory: data/$PROJECT_NAME
 
 jobs:
   dependencies:
