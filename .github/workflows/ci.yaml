@@ -5,7 +5,7 @@ env:
 
 defaults:
   run:
-    working-directory: data/${{ PROJECT_NAME }}
+    working-directory: data/${{ env.PROJECT_NAME }}
 
 jobs:
   dependencies:
@@ -32,8 +32,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/deps
-            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/_build
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ env.PROJECT_NAME }}/deps
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ env.PROJECT_NAME }}/_build
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-
@@ -75,8 +75,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/deps
-            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ PROJECT_NAME }}/_build
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ env.PROJECT_NAME }}/deps
+            /home/runner/work/WebCHaserver/WebCHaserver/data/${{ env.PROJECT_NAME }}/_build
           key: ${{ runner.os }}-mix-${{ hashFiles('mix.lock') }}
 
       - run: mix test --trace --slowest 10
