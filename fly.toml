@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for web-chaser-server on 2023-10-02T12:52:14+09:00
+# fly.toml app configuration file generated for web-chaser-server on 2023-10-02T15:22:47+09:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -11,7 +11,7 @@ swap_size_mb = 512
 [build]
 
 [deploy]
-  #1release_command = "/app/bin/migrate"
+  release_command = "/app/bin/migrate"
 
 [env]
   PHX_HOST = "web-chaser-server.fly.dev"
