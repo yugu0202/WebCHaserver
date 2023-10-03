@@ -5,7 +5,7 @@ env:
 
 defaults:
   run:
-    working-directory: data/hello
+    working-directory: hello
 
 jobs:
   dependencies:
