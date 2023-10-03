@@ -1,12 +1,5 @@
 on: pull_request
 
-env:
-  PROJECT_NAME: hello
-
-defaults:
-  run:
-    working-directory: hello
-
 jobs:
   dependencies:
     runs-on: ubuntu-latest
@@ -29,8 +22,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            data/${{ env.PROJECT_NAME }}/deps
-            data/${{ env.PROJECT_NAME }}/_build
+            deps
+            _build
           key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-
@@ -72,8 +65,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            data/${{ env.PROJECT_NAME }}/deps
-            data/${{ env.PROJECT_NAME }}/_build
+            deps
+            _build
           key: ${{ runner.os }}-mix-${{ hashFiles('mix.lock') }}
 
       - run: mix test --trace --slowest 10
