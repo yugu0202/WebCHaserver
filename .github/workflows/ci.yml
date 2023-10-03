@@ -1,3 +1,5 @@
+name: Elixir CI
+
 on: pull_request
 
 jobs:
