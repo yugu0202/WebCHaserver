@@ -79,6 +79,7 @@ ENV LC_ALL en_US.UTF-8
 
 WORKDIR "/app"
 RUN chown nobody /app
+RUN chmod -R +x /app
 
 # set runner ENV
 ENV MIX_ENV="prod"
