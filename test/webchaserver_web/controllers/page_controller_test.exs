@@ -1,5 +1,5 @@
-defmodule HelloWeb.PageControllerTest do
-  use HelloWeb.ConnCase
+defmodule WebchaserverWeb.PageControllerTest do
+  use WebchaserverWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

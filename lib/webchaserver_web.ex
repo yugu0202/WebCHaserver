@@ -1,12 +1,12 @@
-defmodule HelloWeb do
+defmodule WebchaserverWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use HelloWeb, :controller
-      use HelloWeb, :html
+      use WebchaserverWeb, :controller
+      use WebchaserverWeb, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -40,10 +40,10 @@ defmodule HelloWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: HelloWeb.Layouts]
+        layouts: [html: WebchaserverWeb.Layouts]
 
       import Plug.Conn
-      import HelloWeb.Gettext
+      import WebchaserverWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -52,7 +52,7 @@ defmodule HelloWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {HelloWeb.Layouts, :app}
+        layout: {WebchaserverWeb.Layouts, :app}
 
       unquote(html_helpers())
     end
@@ -84,8 +84,8 @@ defmodule HelloWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import HelloWeb.CoreComponents
-      import HelloWeb.Gettext
+      import WebchaserverWeb.CoreComponents
+      import WebchaserverWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
@@ -98,9 +98,9 @@ defmodule HelloWeb do
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: HelloWeb.Endpoint,
-        router: HelloWeb.Router,
-        statics: HelloWeb.static_paths()
+        endpoint: WebchaserverWeb.Endpoint,
+        router: WebchaserverWeb.Router,
+        statics: WebchaserverWeb.static_paths()
     end
   end
 

@@ -1,5 +1,5 @@
-defmodule HelloWeb.PageController do
-  use HelloWeb, :controller
+defmodule WebchaserverWeb.PageController do
+  use WebchaserverWeb, :controller
 
   def home(conn, _params) do
     # The home page is often custom made,
