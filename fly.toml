@@ -6,7 +6,7 @@
 app = "web-chaser-server"
 primary_region = "nrt"
 kill_signal = "SIGTERM"
-swap_size_mb = 256
+swap_size_mb = 512
 
 [build]
 
