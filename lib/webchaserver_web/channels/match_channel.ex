@@ -1,8 +1,8 @@
-defmodule WebchaserverWeb.RoomChannel do
+defmodule WebchaserverWeb.MatchChannel do
   use WebchaserverWeb, :channel
 
   @impl true
-  def join("room:lobby", payload, socket) do
+  def join("match:lobby", payload, socket) do
     if authorized?(payload) do
       {:ok, socket}
     else
