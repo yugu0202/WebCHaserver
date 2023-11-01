@@ -64,13 +64,13 @@ let messagesContainer = document.querySelector("#messages");
 
 chatInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
-    channel.push("ping", { body: chatInput.value });
+    channel.push("shout", { body: chatInput.value });
     chatInput.value = "";
   }
 });
 
 // 画面表示テスト用
-channel.on("ping", (payload) => {
+channel.on("shout", (payload) => {
   const msgItem = document.createElement("li");
   msgItem.innerText = `[${Date()}] ${payload.body}`;
   messagesContainer.appendChild(msgItem);

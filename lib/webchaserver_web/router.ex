@@ -22,9 +22,11 @@ defmodule WebchaserverWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", WebchaserverWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", WebchaserverWeb do
+    pipe_through(:api)
+
+    resources("/matchs", MatchController, except: [:new, :edit])
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:webchaserver, :dev_routes) do
