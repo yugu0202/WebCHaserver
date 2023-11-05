@@ -18,7 +18,7 @@ defmodule WebchaserverWeb.MatchJSON do
   defp data(%Match{} = match) do
     %{
       id: match.id,
-      id: match.id,
+      match_id: match.match_id,
       map: match.map,
       cool_pos: match.cool_pos,
       hot_pos: match.hot_pos
