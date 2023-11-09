@@ -59,18 +59,24 @@ socket.connect();
 
 //let channel = socket.channel("room:42", {});
 let channel = socket.channel("match:lobby", {});
-let chatInput = document.querySelector("#chat-input");
+let tokenInput = document.querySelector("#token-input");
 let messagesContainer = document.querySelector("#messages");
 
-chatInput.addEventListener("keypress", (event) => {
+tokenInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
-    channel.push("shout", { body: chatInput.value });
-    chatInput.value = "";
+    channel.push("call", { token: tokenInput.value, action: "matching" });
+    tokenInput.value = "";
   }
 });
 
 // 画面表示テスト用
 channel.on("shout", (payload) => {
+  const msgItem = document.createElement("li");
+  msgItem.innerText = `[${Date()}] ${payload.body}`;
+  messagesContainer.appendChild(msgItem);
+});
+
+channel.on("matching", (payload) => {
   const msgItem = document.createElement("li");
   msgItem.innerText = `[${Date()}] ${payload.body}`;
   messagesContainer.appendChild(msgItem);
