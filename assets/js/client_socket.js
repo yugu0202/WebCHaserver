@@ -58,7 +58,7 @@ socket.connect();
 // subtopic is its id - in this case 42:
 
 //let channel = socket.channel("room:42", {});
-let channel = socket.channel("match:lobby", {});
+let channel = socket.channel("match:test", {});
 let tokenInput = document.querySelector("#token-input");
 let messagesContainer = document.querySelector("#messages");
 
