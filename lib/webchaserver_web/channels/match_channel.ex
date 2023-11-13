@@ -69,7 +69,7 @@ defmodule WebchaserverWeb.MatchChannel do
   defp authorized?(socket, %{"token" => token}, subtopic) do
     case Phoenix.Token.verify(socket, "user", token, max_age: 86400) do
       {:ok, %{id: id}} ->
-        data = Userclients.get_data_by_user_id!(id)
+        data = Userclients.get_userclient_by_user_id!(id)
 
         if data.subtopic == subtopic do
           {:ok, socket}
