@@ -20,7 +20,7 @@ defmodule WebchaserverWeb.MatchChannel do
     if authorized?(socket, payload, subtopic) do
       {:ok, socket}
     else
-      {:error, %{reason: "unauthorized"}
+      {:error, %{reason: "unauthorized"}}
     end
   end
 
