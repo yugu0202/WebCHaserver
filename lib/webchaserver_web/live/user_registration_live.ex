@@ -54,8 +54,6 @@ defmodule WebchaserverWeb.UserRegistrationLive do
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
-    IO.puts("user_params: #{inspect(user_params)}")
-
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         {:ok, _} =
