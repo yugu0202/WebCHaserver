@@ -17,7 +17,11 @@ defmodule WebchaserverWeb.MatchChannel do
 
   @impl true
   def join("match:" <> subtopic, payload, socket) do
-    authorized?(socket, payload, subtopic)
+    if authorized?(socket, payload, subtopic) do
+      {:ok, socket}
+    else
+      {:error, %{reason: "unauthorized"}}
+    end
   end
 
   # Channels can be used in a request/response fashion
@@ -74,7 +78,7 @@ defmodule WebchaserverWeb.MatchChannel do
         if sub == subtopic do
           {:ok, socket}
         else
-          {:error, %{reason: "unauthorized"}}
+          false
         end
     end
   end

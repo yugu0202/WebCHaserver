@@ -1,6 +1,6 @@
 defmodule Webchaserver.Userclients do
   @moduledoc """
-  The Matchs context.
+  The Userclients context.
   """
 
   import Ecto.Query, warn: false
@@ -9,98 +9,112 @@ defmodule Webchaserver.Userclients do
   alias Webchaserver.Userclients.Userclient
 
   @doc """
-  Returns the list of matchs.
+  Returns the list of userclients.
   
   ## Examples
   
-      iex> list_matchs()
-      [%Match{}, ...]
+      iex> list_userclients()
+      [%Userclient{}, ...]
   
   """
-  def list_data do
+  def list_userclients do
     Repo.all(Userclient)
   end
 
   @doc """
-  Gets a single match.
+  Gets a single userclient.
   
-  Raises `Ecto.NoResultsError` if the Match does not exist.
+  Raises `Ecto.NoResultsError` if the Userclient does not exist.
   
   ## Examples
   
-      iex> get_match!(123)
-      %Match{}
+      iex> get_userclient!(123)
+      %Userclient{}
   
-      iex> get_match!(456)
+      iex> get_userclient!(456)
       ** (Ecto.NoResultsError)
   
   """
-  def get_data!(id), do: Repo.get!(Userclient, id)
-
-  def get_data_by_user_id!(user_id), do: Repo.get_by!(Userclient, user_id: user_id)
+  def get_userclient!(id), do: Repo.get!(Userclient, id)
 
   @doc """
-  Creates a match.
+  Gets a single userclient by user_id.
+  
+  Raises `Ecto.NoResultsError` if the Userclient does not exist.
   
   ## Examples
   
-      iex> create_match(%{field: value})
-      {:ok, %Match{}}
+      iex> get_userclient!(123)
+      %Userclient{}
   
-      iex> create_match(%{field: bad_value})
+      iex> get_userclient!(456)
+      ** (Ecto.NoResultsError)
+  
+  """
+  def get_userclient_by_user_id!(user_id), do: Repo.get_by!(Userclient, user_id: user_id)
+
+  @doc """
+  Creates a userclient.
+  
+  ## Examples
+  
+      iex> create_userclient(%{field: value})
+      {:ok, %Userclient{}}
+  
+      iex> create_userclient(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
   
   """
-  def create_data(attrs \\ %{}) do
+  def create_userclient(attrs \\ %{}) do
     %Userclient{}
     |> Userclient.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a match.
+  Updates a userclient.
   
   ## Examples
   
-      iex> update_match(match, %{field: new_value})
-      {:ok, %Match{}}
+      iex> update_userclient(userclient, %{field: new_value})
+      {:ok, %Userclient{}}
   
-      iex> update_match(match, %{field: bad_value})
+      iex> update_userclient(userclient, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
   
   """
-  def update_data(%Userclient{} = match, attrs) do
-    match
+  def update_userclient(%Userclient{} = userclient, attrs) do
+    userclient
     |> Userclient.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a match.
+  Deletes a userclient.
   
   ## Examples
   
-      iex> delete_match(match)
-      {:ok, %Match{}}
+      iex> delete_userclient(userclient)
+      {:ok, %Userclient{}}
   
-      iex> delete_match(match)
+      iex> delete_userclient(userclient)
       {:error, %Ecto.Changeset{}}
   
   """
-  def delete_data(%Userclient{} = data) do
-    Repo.delete(data)
+  def delete_userclient(%Userclient{} = userclient) do
+    Repo.delete(userclient)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking match changes.
+  Returns an `%Ecto.Changeset{}` for tracking userclient changes.
   
   ## Examples
   
-      iex> change_match(match)
-      %Ecto.Changeset{data: %Match{}}
+      iex> change_userclient(userclient)
+      %Ecto.Changeset{data: %Userclient{}}
   
   """
-  def change_data(%Userclient{} = data, attrs \\ %{}) do
-    Userclient.changeset(data, attrs)
+  def change_userclient(%Userclient{} = userclient, attrs \\ %{}) do
+    Userclient.changeset(userclient, attrs)
   end
 end
