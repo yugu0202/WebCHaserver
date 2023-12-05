@@ -8,7 +8,7 @@ defmodule Webchaserver.MatchsTest do
 
     import Webchaserver.MatchsFixtures
 
-    @invalid_attrs %{cool_pos: nil, hot_pos: nil, id: nil, map: nil}
+    @invalid_attrs %{cool_pos: nil, hot_pos: nil, map: nil}
 
     test "list_matchs/0 returns all matchs" do
       match = match_fixture()
@@ -36,7 +36,13 @@ defmodule Webchaserver.MatchsTest do
 
     test "update_match/2 with valid data updates the match" do
       match = match_fixture()
-      update_attrs = %{cool_pos: "some updated cool_pos", hot_pos: "some updated hot_pos", id: 43, map: "some updated map"}
+
+      update_attrs = %{
+        cool_pos: "some updated cool_pos",
+        hot_pos: "some updated hot_pos",
+        id: 43,
+        map: "some updated map"
+      }
 
       assert {:ok, %Match{} = match} = Matchs.update_match(match, update_attrs)
       assert match.cool_pos == "some updated cool_pos"

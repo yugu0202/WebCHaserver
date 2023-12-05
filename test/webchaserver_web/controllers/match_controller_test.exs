@@ -8,13 +8,11 @@ defmodule WebchaserverWeb.MatchControllerTest do
   @create_attrs %{
     cool_pos: "some cool_pos",
     hot_pos: "some hot_pos",
-    id: 42,
     map: "some map"
   }
   @update_attrs %{
     cool_pos: "some updated cool_pos",
     hot_pos: "some updated hot_pos",
-    id: 43,
     map: "some updated map"
   }
   @invalid_attrs %{cool_pos: nil, hot_pos: nil, id: nil, map: nil}
@@ -41,7 +39,6 @@ defmodule WebchaserverWeb.MatchControllerTest do
                "id" => ^id,
                "cool_pos" => "some cool_pos",
                "hot_pos" => "some hot_pos",
-               "id" => 42,
                "map" => "some map"
              } = json_response(conn, 200)["data"]
     end
@@ -65,7 +62,6 @@ defmodule WebchaserverWeb.MatchControllerTest do
                "id" => ^id,
                "cool_pos" => "some updated cool_pos",
                "hot_pos" => "some updated hot_pos",
-               "id" => 43,
                "map" => "some updated map"
              } = json_response(conn, 200)["data"]
     end
@@ -83,9 +79,9 @@ defmodule WebchaserverWeb.MatchControllerTest do
       conn = delete(conn, ~p"/api/matchs/#{match}")
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent(404, fn ->
         get(conn, ~p"/api/matchs/#{match}")
-      end
+      end)
     end
   end
 
