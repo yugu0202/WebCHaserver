@@ -17,9 +17,10 @@ defmodule Webchaserver.Application do
       # Start Finch
       {Finch, name: Webchaserver.Finch},
       # Start the Endpoint (http/https)
-      WebchaserverWeb.Endpoint
+      WebchaserverWeb.Endpoint,
       # Start a worker by calling: Webchaserver.Worker.start_link(arg)
       # {Webchaserver.Worker, arg}
+      WebchaserverWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

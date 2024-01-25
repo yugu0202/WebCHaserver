@@ -22,6 +22,14 @@ defmodule WebchaserverWeb.Router do
 
     get("/", PageController, :home)
     get("/test", PageController, :test)
+    get("/match", PageController, :match)
+  end
+
+  scope "/", WebchaserverWeb do
+    pipe_through([:browser, :require_authenticated_user])
+
+    get("/token", PageController, :token)
+    get("/testverify", PageController, :testverify)
   end
 
   # Other scopes may use custom stacks.

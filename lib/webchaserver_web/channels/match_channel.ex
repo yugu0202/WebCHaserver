@@ -1,23 +1,16 @@
 defmodule WebchaserverWeb.MatchChannel do
   use WebchaserverWeb, :channel
 
+  alias WebchaserverWeb.Presence
   alias Webchaserver.Matchs
   alias Webchaserver.Matchs.Match
   alias Webchaserver.Userclients
   alias Webchaserver.Userclients.Userclient
 
   @impl true
-  def join("match:lobby", payload, socket) do
-    if authorized?(payload) do
-      {:ok, socket}
-    else
-      {:error, %{reason: "unauthorized"}}
-    end
-  end
-
-  @impl true
-  def join("match:" <> subtopic, payload, socket) do
-    if authorized?(socket, payload, subtopic) do
+  def join("match:" <> subtopic, _payload, socket) do
+    if authorized?(socket.assigns.user_id, subtopic) do
+      send(self(), :after_join)
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -40,46 +33,48 @@ defmodule WebchaserverWeb.MatchChannel do
   end
 
   @impl true
-  def handle_in("call", %{"token" => token, "action" => action}, socket) do
-    case action do
-      "matching" ->
-        broadcast(socket, "matching", %{body: token})
+  def handle_in("call", %{"action" => action}, socket) do
+    IO.puts "action #{action}"
+    member = Presence.list(socket) |> map_size()
+    case {action, member} do
+      {"matching", 2} ->
+        broadcast(socket, "matching", %{data: %{ready: "ready"}})
+      {"matching", 1} ->
+        broadcast(socket, "matching", %{data: %{ready: "waiting"}})
+      {"getready", 2} ->
+        user_id = Integer.to_string(socket.assigns.user_id)
+        %{^user_id => data} = Presence.list(socket)
+        IO.inspect(data)
+        IO.inspect(socket.assigns)
+        push(socket, "call", %{data: "arround data"})
+      {_, 2} ->
+        Matchsystem.command(action)
     end
 
-    # case Phoenix.Token.verify(socket, "match", token, max_age: 86400) do
-    # {:ok, %{id: id}} ->
-    # match = Matchs.get_match!(id)
-
-    # case action do
-    # "matching" ->
-    # broadcast(socket, "matching", %{data: %{match: match}})
-
-    # "delete" ->
-    # broadcast(socket, "delete", %{data: %{match: match}})
-    # end
-
-    # {:noreply, socket}
-
-    # {:error, _} ->
-    # {:error, %{reason: "unauthorized"}}
-    # end
+    {:noreply, socket}
   end
 
-  # Add authorization logic here as required.
-  defp authorized?(_payload) do
-    true
+  @impl true
+  def handle_info(:after_join, socket) do
+    {:ok, _} =
+      Presence.track(socket, socket.assigns.user_id , %{
+        online_at: inspect(System.system_time(:second)),
+      })
+
+    {:noreply, socket}
   end
 
-  defp authorized?(socket, %{"token" => token}, subtopic) do
-    case Phoenix.Token.verify(socket, "user", token, max_age: 86400) do
-      {:ok, %{id: id}} ->
-        %{subtopic: sub} = Userclients.get_data_by_user_id!(id)
+  defp authorized?(id, subtopic) do
+      IO.puts "id: #{id}"
 
-        if sub == subtopic do
-          {:ok, socket}
-        else
-          false
-        end
-    end
+      %{subtopic: sub} = Userclients.get_userclient_by_user_id!(id)
+
+      IO.puts "sub: #{sub}"
+
+      if sub == subtopic do
+        true
+      else
+        false
+      end
   end
 end
