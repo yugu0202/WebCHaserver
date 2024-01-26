@@ -6,12 +6,20 @@ defmodule WebchaserverWeb.MatchChannel do
   alias Webchaserver.Matchs.Match
   alias Webchaserver.Userclients
   alias Webchaserver.Userclients.Userclient
+  alias Webchaserver.Matchsystem
 
   @impl true
   def join("match:" <> subtopic, _payload, socket) do
     if authorized?(socket.assigns.user_id, subtopic) do
       send(self(), :after_join)
-      {:ok, socket}
+      %{id: register_id} = Userclients.get_userclient_by_user_id(socket.assigns.user_id)
+
+      %{id: first_register_id} = Userclients.get_userclient_by_subtopic(subtopic)
+      if register_id == first_register_id do
+        {:ok, assign(socket, :player, "cool")}
+      else
+        {:ok, assign(socket, :player, "hot")}
+      end
     else
       {:error, %{reason: "unauthorized"}}
     end
@@ -37,18 +45,35 @@ defmodule WebchaserverWeb.MatchChannel do
     IO.puts "action #{action}"
     member = Presence.list(socket) |> map_size()
     case {action, member} do
+      {_, 1} ->
+        broadcast(socket, "call", %{data: %{ready: "waiting"}})
       {"matching", 2} ->
-        broadcast(socket, "matching", %{data: %{ready: "ready"}})
-      {"matching", 1} ->
-        broadcast(socket, "matching", %{data: %{ready: "waiting"}})
-      {"getready", 2} ->
-        user_id = Integer.to_string(socket.assigns.user_id)
-        %{^user_id => data} = Presence.list(socket)
-        IO.inspect(data)
-        IO.inspect(socket.assigns)
-        push(socket, "call", %{data: "arround data"})
+        mapdata = "
+          D:0,0,3,0,3,0,3,0,0,0,0,0,0,0,0
+          D:3,2,2,0,2,2,0,2,0,2,2,2,0,2,0
+          D:0,0,3,0,3,2,3,0,3,2,0,3,0,3,0
+          D:0,2,0,2,0,2,0,2,0,0,0,2,2,2,0
+          D:0,2,3,2,3,2,3,2,3,2,0,3,0,3,0
+          D:0,2,0,2,0,2,0,2,0,0,0,2,2,2,0
+          D:0,0,3,0,3,0,3,0,3,2,0,3,0,3,0
+          D:0,2,2,0,2,0,2,2,0,2,0,2,0,2,0
+          D:0,0,0,0,0,0,0,3,0,0,0,0,0,0,0
+          D:0,2,0,2,0,2,0,2,2,0,2,0,2,2,0
+          D:0,3,0,3,0,2,3,0,3,0,3,0,3,0,0
+          D:0,2,2,2,0,0,0,2,0,2,0,2,0,2,0
+          D:0,3,0,3,0,2,3,2,3,2,3,2,3,2,0
+          D:0,2,2,2,0,0,0,2,0,2,0,2,0,2,0
+          D:0,3,0,3,0,2,3,0,3,2,3,0,3,0,0
+          D:0,2,0,2,2,2,0,2,0,2,2,0,2,2,3
+          D:0,0,0,0,0,0,0,0,3,0,3,0,3,0,0
+        "
+
+        Matchs.create_match(%{map: String, cool_pos: "0,0", hot_pos: "14,16", size: "15x17"})
+        broadcast(socket, "call", %{data: %{ready: "ready"}})
       {_, 2} ->
-        Matchsystem.command(action)
+        IO.inspect(socket.assigns)
+        ret = Matchsystem.command(action)
+        push(socket, "call", %{data: ret})
     end
 
     {:noreply, socket}
@@ -56,18 +81,20 @@ defmodule WebchaserverWeb.MatchChannel do
 
   @impl true
   def handle_info(:after_join, socket) do
+
     {:ok, _} =
       Presence.track(socket, socket.assigns.user_id , %{
-        online_at: inspect(System.system_time(:second)),
+        online_at: System.system_time(:second) |> inspect(),
       })
 
-    {:noreply, socket}
+
+      {:noreply, socket}
   end
 
   defp authorized?(id, subtopic) do
       IO.puts "id: #{id}"
 
-      %{subtopic: sub} = Userclients.get_userclient_by_user_id!(id)
+      %{subtopic: sub} = Userclients.get_userclient_by_user_id(id)
 
       IO.puts "sub: #{sub}"
 

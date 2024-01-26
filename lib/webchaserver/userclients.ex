@@ -51,10 +51,14 @@ defmodule Webchaserver.Userclients do
       ** (Ecto.NoResultsError)
 
   """
-  def get_userclient_by_user_id!(user_id), do: Repo.get_by!(Userclient, user_id: user_id)
+  def get_userclient_by_user_id(user_id), do: Repo.get_by(Userclient, user_id: user_id)
 
   def get_userclient_latest2() do
     Repo.all(from u in Userclient, order_by: [asc: u.id], limit: 2)
+  end
+
+  def get_userclient_by_subtopic(subtopic) do
+    Repo.one(from u in Userclient, where: ^subtopic == u.subtopic, order_by: [asc: u.id], limit: 1)
   end
 
   @doc """

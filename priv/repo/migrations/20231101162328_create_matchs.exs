@@ -6,6 +6,7 @@ defmodule Webchaserver.Repo.Migrations.CreateMatchs do
       add(:map, :string)
       add(:cool_pos, :string)
       add(:hot_pos, :string)
+      add(:size, :string)
 
       timestamps()
     end

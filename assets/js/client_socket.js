@@ -82,9 +82,6 @@ if (connectButton) {
       console.log(payload);
     });
 
-    channel.on("matching", (payload) => {
-      console.log(payload);
-    });
   });
 
   callButton.addEventListener("click", (event) => {

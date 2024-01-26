@@ -6,6 +6,7 @@ defmodule Webchaserver.Matchs.Match do
     field(:cool_pos, :string)
     field(:hot_pos, :string)
     field(:map, :string)
+    field(:size, :string)
 
     timestamps()
   end
@@ -13,7 +14,7 @@ defmodule Webchaserver.Matchs.Match do
   @doc false
   def changeset(match, attrs) do
     match
-    |> cast(attrs, [:map, :cool_pos, :hot_pos])
-    |> validate_required([:map, :cool_pos, :hot_pos])
+    |> cast(attrs, [:map, :cool_pos, :hot_pos, :size])
+    |> validate_required([:map, :cool_pos, :hot_pos, :size])
   end
 end
