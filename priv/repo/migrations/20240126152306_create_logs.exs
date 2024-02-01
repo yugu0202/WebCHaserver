@@ -10,6 +10,8 @@ defmodule Webchaserver.Repo.Migrations.CreateLogs do
       add :map_size, :string, size: 5
       add :cool_pos, :string, size: 5
       add :hot_pos, :string, size: 5
+      add :cool_score, :integer
+      add :hot_score, :integer
       add :return, {:array, :integer}
 
       timestamps()

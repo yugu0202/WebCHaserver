@@ -38,7 +38,7 @@ defmodule Webchaserver.Logs do
   def get_log!(id), do: Repo.get!(Log, id)
 
   def get_log_by_match_id(match_id) do
-    Repo.one(from u in Log, where: ^match_id == u.match_id, order_by: [asc: u.id], limit: 1)
+    Repo.one(from u in Log, where: ^match_id == u.match_id, order_by: [desc: u.id], limit: 1)
   end
 
   @doc """

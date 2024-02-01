@@ -11,6 +11,8 @@ defmodule Webchaserver.Logs.Log do
     field :map_size, :string
     field :cool_pos, :string
     field :hot_pos, :string
+    field :cool_score, :integer
+    field :hot_score, :integer
 
     timestamps()
   end
@@ -18,7 +20,7 @@ defmodule Webchaserver.Logs.Log do
   @doc false
   def changeset(log, attrs) do
     log
-    |> cast(attrs, [:match_id, :player, :action, :return, :map_data, :map_size, :cool_pos, :hot_pos])
-    |> validate_required([:match_id, :player, :action, :return, :map_data, :map_size, :cool_pos, :hot_pos])
+    |> cast(attrs, [:match_id, :player, :action, :return, :map_data, :map_size, :cool_pos, :hot_pos, :cool_score, :hot_score])
+    |> validate_required([:match_id, :player, :action, :return, :map_data, :map_size, :cool_pos, :hot_pos, :cool_score, :hot_score])
   end
 end

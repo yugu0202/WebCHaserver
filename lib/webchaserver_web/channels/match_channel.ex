@@ -6,10 +6,10 @@ defmodule WebchaserverWeb.MatchChannel do
   alias Webchaserver.Matchs.Match
   alias Webchaserver.Userclients
   alias Webchaserver.Userclients.Userclient
-  alias Webchaserver.Matchsubtopics
-  alias Webchaserver.Matchsubtopics.Matchsubtopic
   alias Webchaserver.Logs
   alias Webchaserver.Logs.Log
+  alias Webchaserver.Usermatchs
+  alias Webchaserver.Usermatchs.Usermatch
   alias Webchaserver.Matchsystem
 
   @impl true
@@ -47,13 +47,16 @@ defmodule WebchaserverWeb.MatchChannel do
   @impl true
   def handle_in("call", %{"action" => action}, socket) do
     IO.puts "action #{action}"
-    "match:" <> subtopic = socket.topic
     member = Presence.list(socket) |> map_size()
+
     case {action, member} do
       {_, 1} ->
         broadcast(socket, "result", %{data: %{ready: "waiting"}})
+        {:noreply, socket}
       {"matching", 2} ->
-        if Matchsubtopics.get_matchsubtopic_by_subtopic_is_active(subtopic) == nil do
+        users = Enum.map(Presence.list(socket), fn(x) -> Kernel.elem(x, 0) end)
+
+        unless Usermatchs.exist_usermatch_by_user_id_not_end(hd(users)) do
           mapdata =
             "D:0,0,3,0,3,0,3,0,0,0,0,0,0,0,0
             D:3,2,2,0,2,2,0,2,0,2,2,2,0,2,0
@@ -75,21 +78,31 @@ defmodule WebchaserverWeb.MatchChannel do
             |> String.replace(["D:", " "], "") #とりあえずサンプルデータとして成形
 
           {:ok, %{id: id}} = Matchs.create_match(%{map: mapdata, cool_pos: "0,0", hot_pos: "14,16", size: "15x17"})
-          Logs.create_log(%{match_id: id, player: "cool", action: "matching", return: [id], map_data: mapdata, map_size: "15x17", cool_pos: "0,0", hot_pos: "14,16"})
-          Matchsubtopics.create_matchsubtopic(%{match_id: id, subtopic: subtopic, is_active: true})
+          Logs.create_log(%{match_id: id, player: "cool", action: "matching", return: [id], map_data: mapdata, map_size: "15x17", cool_pos: "0,0", hot_pos: "14,16", cool_score: 0, hot_score: 0})
+          Usermatchs.create_usermatch2(%{user_id: hd(users), match_id: id}, %{user_id: Enum.at(users, 1), match_id: id})
         end
 
         broadcast(socket, "result", %{data: %{ready: "ready"}})
+        {:noreply, socket}
       {_, 2} ->
-        IO.inspect(socket.assigns)
-        player = socket.assigns.player
-        %{match_id: id} = Matchsubtopics.get_matchsubtopic_by_subtopic_is_active(subtopic)
-        log = Logs.get_log_by_match_id(id)
-        ret = Matchsystem.command(id, player, action, log)
-        push(socket, "result", %{data: ret})
+        unless Usermatchs.exist_usermatch_by_user_id_not_end(socket.assigns.user_id) do
+          push(socket, "result", %{data: [0,0,0,0,0,0,0,0,0,0]})
+          {:stop, :shutdown, socket}
+        else
+          player = socket.assigns.player
+          %{match_id: id} = Usermatchs.get_usermatch_by_user_id_not_end(socket.assigns.user_id)
+          log = Logs.get_log_by_match_id(id)
+          {ret, is_end} = Matchsystem.command(id, player, action, log)
+          push(socket, "result", %{data: ret})
+          if is_end do
+            Usermatchs.update_usermatch_end(id)
+            {:stop, :shutdown, socket}
+          else
+            {:noreply, socket}
+          end
+        end
     end
 
-    {:noreply, socket}
   end
 
   @impl true

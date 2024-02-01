@@ -2,6 +2,7 @@ defmodule WebchaserverWeb.PageController do
   use WebchaserverWeb, :controller
 
   alias Webchaserver.Userclients
+  alias Webchaserver.Usermatchs
 
   def home(conn, _params) do
     # The home page is often custom made,
@@ -12,7 +13,38 @@ defmodule WebchaserverWeb.PageController do
   def test(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
-    token = Phoenix.Token.sign(conn, "user", conn.assigns[:current_user].id)
+    current_user = conn.assigns[:current_user]
+
+    user = Userclients.get_userclient_by_user_id(current_user.id)
+
+    IO.inspect(user)
+
+    token = Phoenix.Token.sign(conn, "user", current_user.id)
+
+    if user == nil do
+      userclient = Userclients.get_userclient_latest2()
+      subtopic =
+      case userclient |> length do
+        0 ->
+          "1"
+        1 ->
+          hd(userclient).subtopic
+        2 ->
+          [first | second] = userclient
+          second = hd(second)
+          if first.subtopic == second.subtopic do
+            String.to_integer(first.subtopic) + 1 |> Integer.to_string()
+          else
+            second.subtopic
+          end
+      end
+
+      Userclients.create_userclient(%{user_id: current_user.id, subtopic: subtopic})
+      subtopic
+    else
+      user.subtopic
+    end
+
     render(assign(conn, :user_token, token), :test, layout: false)
   end
 
@@ -65,5 +97,11 @@ defmodule WebchaserverWeb.PageController do
       {:error, _} ->
         render(conn, :testverify, layout: false, user_id: nil)
     end
+  end
+
+  def mymatch(conn, _params) do
+    matchs = Usermatchs.list_usermatchs_by_user_id(conn.assigns[:current_user].id)
+
+    render(conn, :mymatch, layout: false, matchs: matchs)
   end
 end
