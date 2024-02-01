@@ -78,7 +78,7 @@ if (connectButton) {
         console.log("Unable to join", resp);
       });
 
-    channel.on("call", (payload) => {
+    channel.on("result", (payload) => {
       console.log(payload);
     });
 

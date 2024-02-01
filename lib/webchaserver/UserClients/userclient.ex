@@ -3,8 +3,8 @@ defmodule Webchaserver.Userclients.Userclient do
   import Ecto.Changeset
 
   schema "userclient" do
-    field(:user_id, :integer)
-    field(:subtopic, :string)
+    field :user_id, :integer
+    field :subtopic, :string
 
     timestamps()
   end
