@@ -7,10 +7,10 @@ defmodule Webchaserver.Logs.Log do
     field :player, :string
     field :action, :string
     field :return, {:array, :integer}
-    field :map_data, :string
-    field :map_size, :string
-    field :cool_pos, :string
-    field :hot_pos, :string
+    field :map_data, {:array, {:array, :integer}}
+    field :map_size, {:array, :integer}
+    field :cool_pos, {:array, :integer}
+    field :hot_pos, {:array, :integer}
     field :cool_score, :integer
     field :hot_score, :integer
 

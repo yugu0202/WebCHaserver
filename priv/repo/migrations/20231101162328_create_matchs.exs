@@ -3,10 +3,10 @@ defmodule Webchaserver.Repo.Migrations.CreateMatchs do
 
   def change do
     create table(:matchs) do
-      add(:map, :string, size: 1024)
-      add(:cool_pos, :string, size: 5)
-      add(:hot_pos, :string, size: 5)
-      add(:size, :string, size: 5)
+      add :map, {:array, {:array, :integer}}
+      add :cool_pos, {:array, :integer}
+      add :hot_pos, {:array, :integer}
+      add :size, {:array, :integer}
 
       timestamps()
     end

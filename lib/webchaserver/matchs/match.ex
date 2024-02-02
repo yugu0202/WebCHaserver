@@ -3,10 +3,10 @@ defmodule Webchaserver.Matchs.Match do
   import Ecto.Changeset
 
   schema "matchs" do
-    field :cool_pos, :string
-    field :hot_pos, :string
-    field :map, :string
-    field :size, :string
+    field :cool_pos, {:array, :integer}
+    field :hot_pos, {:array, :integer}
+    field :map, {:array, {:array, :integer}}
+    field :size, {:array, :integer}
 
     timestamps()
   end

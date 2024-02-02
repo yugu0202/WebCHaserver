@@ -1,191 +1,214 @@
 defmodule Webchaserver.Matchsystem do
 
   alias Webchaserver.Logs
-  alias Webchaserver.Logs.Log
+  alias Webchaserver.Matchresults
+
+  def action(match_id, player, action, log) do
+    case act_check(player, action, log) do
+      true -> command(match_id, player, action, log)
+      false ->
+        enemy = case player do
+          "cool" -> "hot"
+          "hot" -> "cool"
+        end
+        Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} wrong action", cool_score: log.cool_score, hot_score: log.hot_score})
+        {[0,0,0,0,0,0,0,0,0,0], true}
+    end
+  end
 
   def command(match_id, player, "walk" <> direction, log) do
     IO.puts "walk #{direction}"
     IO.puts "match_id: #{match_id}"
     IO.puts "player: #{player}"
 
-    {my_pos_data, enemy_pos_data, score} = case player do
-      "cool" ->
-        %{cool_pos: my_pos, hot_pos: enemy_pos, cool_score: score} = log
-        {my_pos, enemy_pos, score}
-      "hot" ->
-        %{cool_pos: enemy_pos, hot_pos: my_pos, hot_score: score} = log
-        {my_pos, enemy_pos, score}
-    end
+    %{map_data: map, map_size: size} = log
 
-    %{map_data: map_data, map_size: map_size} = log
-
-    map = map_data
-    |> String.split("\n")
-    |> Enum.map(&String.split(&1, ","))
-
-    IO.inspect(map)
-
-    size = map_size
-    |> String.split("x")
-    |> Enum.map(&String.to_integer(&1))
+    {my_pos, enemy_pos, my_score, enemy_score} =
+      case player do
+        "cool" ->
+          {log.cool_pos, log.hot_pos, log.cool_score, log.hot_score}
+        "hot" ->
+          {log.hot_pos, log.cool_pos, log.hot_score, log.cool_score}
+      end
 
     IO.inspect(size)
-
-    my_pos = my_pos_data
-    |> String.split(",")
-    |> Enum.map(&String.to_integer(&1))
-
+    IO.inspect(map)
     IO.inspect(my_pos)
-
-    enemy_pos = enemy_pos_data
-    |> String.split(",")
-    |> Enum.map(&String.to_integer(&1))
-
     IO.inspect(enemy_pos)
 
     after_pos = case direction do
-      "up" ->
-        [x, y] = my_pos
-        [x, y-1]
-      "right" ->
-        [x, y] = my_pos
-        [x+1, y]
-      "left" ->
-        [x, y] = my_pos
-        [x-1, y]
-      "down" ->
-        [x, y] = my_pos
-        [x, y+1]
+      "up" -> [Enum.at(my_pos, 0), Enum.at(my_pos, 1)-1]
+      "right" -> [Enum.at(my_pos, 0)+1, Enum.at(my_pos, 1)]
+      "left" -> [Enum.at(my_pos, 0)-1, Enum.at(my_pos, 1)]
+      "down" -> [Enum.at(my_pos, 0), Enum.at(my_pos, 1)+1]
     end
 
-    {map, score} =
-    if get_point(after_pos, map, hd(size), enemy_pos) == "3" do
-      map = set_point(after_pos, map, "0")
-      {set_point(my_pos, map, "2"), score + 1}
+    {map, my_score} =
+      if get_point(after_pos, map, hd(size), enemy_pos) == 3 do
+        after_map = map
+        |> set_point(after_pos, 0)
+        |> set_point(my_pos, 2)
+
+        {after_map, my_score + 1}
+      else
+        {map, my_score}
+      end
+
+    is_end = if get_point(after_pos, map, hd(size), enemy_pos) == 2 do
+      enemy = case player do
+        "cool" -> "hot"
+        "hot" -> "cool"
+      end
+      Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} bad walk", cool_score: my_score, hot_score: enemy_score})
+      true
     else
-      {map, score}
+      false
     end
-
-    is_end = if get_point(after_pos, map, hd(size), enemy_pos) == "2", do: true, else: false
 
     arround_data = get_arround(after_pos, map, hd(size), enemy_pos)
 
-    map_data = map_to_string(map)
-    my_pos_data = pos_to_string(after_pos)
-
     case player do
       "cool" ->
-        IO.puts "cool"
-        {:ok, hot_score} = Map.fetch(log, :hot_score)
-        Logs.create_log(%{match_id: match_id, player: player, action: "walk" <> direction, return: arround_data, map_data: map_data, map_size: map_size, cool_pos: my_pos_data, hot_pos: enemy_pos_data,cool_score: score, hot_score: hot_score})
+        Logs.create_log(%{match_id: match_id, player: player, action: "walk"<>direction, return: arround_data, map_data: map, map_size: size, cool_pos: my_pos, hot_pos: enemy_pos, cool_score: my_score, hot_score: enemy_score})
       "hot" ->
-        IO.puts "hot"
-        {:ok, cool_score} = Map.fetch(log, :cool_score)
-        Logs.create_log(%{match_id: match_id, player: player, action: "walk" <> direction, return: arround_data, map_data: map_data, map_size: map_size, cool_pos: enemy_pos_data, hot_pos: my_pos_data, hot_score: score, cool_score: cool_score})
+        Logs.create_log(%{match_id: match_id, player: player, action: "walk"<>direction, return: arround_data, map_data: map, map_size: size, cool_pos: enemy_pos, hot_pos: my_pos, hot_score: my_score, cool_score: enemy_score})
     end
 
-    {["1" | arround_data], is_end}
+    {[unless(is_end, do: 1, else: 0) | arround_data], is_end}
   end
+
 
   def command(match_id, player, "look" <> direction, log) do
     IO.puts "look #{direction}"
     IO.puts "match_id: #{match_id}"
     IO.puts "player: #{player}"
 
-    {my_pos_data, enemy_pos_data} = case player do
-      "cool" ->
-        %{cool_pos: my_pos, hot_pos: enemy_pos} = log
-        {my_pos, enemy_pos}
-      "hot" ->
-        %{cool_pos: enemy_pos, hot_pos: my_pos} = log
-        {my_pos, enemy_pos}
-    end
+    %{map_data: map, map_size: size} = log
 
-    %{map_data: map_data, map_size: map_size} = log
-
-    map = map_data
-    |> String.split("\n")
-    |> Enum.map(&String.split(&1, ","))
-
-    IO.inspect(map)
-
-    size = map_size
-    |> String.split("x")
-    |> Enum.map(&String.to_integer(&1))
+    {my_pos, enemy_pos} =
+      case player do
+        "cool" ->
+          {log.cool_pos, log.hot_pos}
+        "hot" ->
+          {log.hot_pos, log.cool_pos}
+      end
 
     IO.inspect(size)
-
-    my_pos = my_pos_data
-    |> String.split(",")
-    |> Enum.map(&String.to_integer(&1))
-
+    IO.inspect(map)
     IO.inspect(my_pos)
-
-    enemy_pos = enemy_pos_data
-    |> String.split(",")
-    |> Enum.map(&String.to_integer(&1))
-
     IO.inspect(enemy_pos)
 
-    case direction do
-      "up" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "right" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "left" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "down" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      _ ->
-        [0,0,0,0,0,0,0,0,0,0]
+    look_pos = case direction do
+      "up" -> [Enum.at(my_pos, 0), Enum.at(my_pos, 1)-2]
+      "right" -> [Enum.at(my_pos, 0)+2, Enum.at(my_pos, 1)]
+      "left" -> [Enum.at(my_pos, 0)-2, Enum.at(my_pos, 1)]
+      "down" -> [Enum.at(my_pos, 0), Enum.at(my_pos, 1)+2]
     end
+
+    look_data = get_arround(look_pos, map, hd(size), enemy_pos)
+
+    Logs.create_log(%{match_id: match_id, player: player, action: "look"<>direction, return: look_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+
+    {[1 | look_data], false}
   end
 
-  def command(match_id, player, "search" <> direction) do
+
+  def command(match_id, player, "search" <> direction, log) do
     IO.puts "search #{direction}"
     IO.puts "match_id: #{match_id}"
     IO.puts "player: #{player}"
 
-    case direction do
-      "up" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "right" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "left" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "down" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      _ ->
-        [0,0,0,0,0,0,0,0,0,0]
-    end
+    %{map_data: map, map_size: size} = log
+
+    {my_pos, enemy_pos} =
+      case player do
+        "cool" ->
+          {log.cool_pos, log.hot_pos}
+        "hot" ->
+          {log.hot_pos, log.cool_pos}
+      end
+
+    IO.inspect(size)
+    IO.inspect(map)
+    IO.inspect(my_pos)
+    IO.inspect(enemy_pos)
+
+    search_data = search(my_pos, map, hd(size), enemy_pos, direction)
+
+    Logs.create_log(%{match_id: match_id, player: player, action: "search"<>direction, return: search_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+
+    {[1 | search_data], false}
   end
 
-  def command(match_id, player, "put" <> direction) do
+
+  def command(match_id, player, "put" <> direction, log) do
     IO.puts "put #{direction}"
     IO.puts "match_id: #{match_id}"
     IO.puts "player: #{player}"
 
-    case direction do
-      "up" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "right" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "left" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      "down" ->
-        [0,0,0,0,0,0,0,0,0,0]
-      _ ->
-        [0,0,0,0,0,0,0,0,0,0]
+    %{map_data: map, map_size: size} = log
+
+    {my_pos, enemy_pos} =
+      case player do
+        "cool" ->
+          {log.cool_pos, log.hot_pos}
+        "hot" ->
+          {log.hot_pos, log.cool_pos}
+      end
+
+    IO.inspect(size)
+    IO.inspect(map)
+    IO.inspect(my_pos)
+    IO.inspect(enemy_pos)
+
+    put_pos = case direction do
+      "up" -> [Enum.at(my_pos, 0), Enum.at(my_pos, 1)-1]
+      "right" -> [Enum.at(my_pos, 0)+1, Enum.at(my_pos, 1)]
+      "left" -> [Enum.at(my_pos, 0)-1, Enum.at(my_pos, 1)]
+      "down" -> [Enum.at(my_pos, 0), Enum.at(my_pos, 1)+1]
     end
+
+    map = set_point(map, put_pos, 2)
+
+    is_end = if get_point(put_pos, map, hd(size), enemy_pos) == 1 do
+      Matchresults.create_matchresult(%{match_id: match_id, result: "#{player} win", reason: "#{player} put", cool_score: log.cool_score, hot_score: log.hot_score})
+      true
+    else
+      false
+    end
+
+    arround_data = get_arround(my_pos, map, hd(size), enemy_pos)
+
+    Logs.create_log(%{match_id: match_id, player: player, action: "put"<>direction, return: arround_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+
+    {[unless(is_end, do: 1, else: 0) | arround_data], is_end}
   end
 
   def command(match_id, player, "getready", log) do
     IO.puts "getready"
     IO.puts "match_id: #{match_id}"
     IO.puts "player: #{player}"
-    %{}
 
-    [0,0,0,0,0,0,0,0,0,0]
+    %{map_data: map, map_size: size} = log
+
+    {my_pos, enemy_pos} =
+      case player do
+        "cool" ->
+          {log.cool_pos, log.hot_pos}
+        "hot" ->
+          {log.hot_pos, log.cool_pos}
+      end
+
+    IO.inspect(size)
+    IO.inspect(map)
+    IO.inspect(my_pos)
+    IO.inspect(enemy_pos)
+
+    arround_data = get_arround(my_pos, map, hd(size), enemy_pos)
+
+    Logs.create_log(%{match_id: match_id, player: player, action: "getready", return: arround_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+
+    {[1 | arround_data], false}
   end
 
   def command(_, _, _, _) do
@@ -200,19 +223,32 @@ defmodule Webchaserver.Matchsystem do
     get_point([x-1, y+1], map, sizex, enemy_pos), get_point([x, y+1], map, sizex, enemy_pos), get_point([x+1, y+1], map, sizex, enemy_pos)]
   end
 
+  def search(pos, map, sizex, enemy_pos, direction) do
+    [x, y] = pos
+
+    [dx, dy] = case direction do
+      "up" -> [0, -1]
+      "right" -> [1, 0]
+      "left" -> [-1, 0]
+      "down" -> [0, 1]
+    end
+
+    Enum.map(1..9, fn(i) -> get_point([x+dx*i, y+dy*i], map, sizex, enemy_pos) end)
+  end
+
   def get_point(pos, map, sizex, enemy_pos) do
     [x, y] = pos
     [ex, ey] = enemy_pos
 
-    default = Enum.map(1..sizex, fn(_) -> "2" end)
+    default = Enum.map(1..sizex, fn(_) -> 2 end)
     cond do
-      x < 0 or y < 0 -> "2"
-      x == ex and y == ey -> "1"
-      true -> Enum.at(Enum.at(map, y, default), x, "2")
+      x < 0 or y < 0 -> 2
+      x == ex and y == ey -> 1
+      true -> Enum.at(Enum.at(map, y, default), x, 2)
     end
   end
 
-  def set_point(pos, map, value) do
+  def set_point(map, pos, value) do
     [x, y] = pos
 
     if x < 0 or y < 0 do
@@ -222,14 +258,18 @@ defmodule Webchaserver.Matchsystem do
     end
   end
 
-  def pos_to_string(pos) do
-    [x, y] = pos
-    "#{x},#{y}"
-  end
+  def act_check(player, action, log) do
+    before_action = log.action
+    before_player = log.player
 
-  def map_to_string(map) do
-    map
-    |> Enum.map(&Enum.join(&1, ","))
-    |> Enum.join("\n")
+    cond do
+      before_action == "matching" and player == "cool" and action == "getready" -> true
+      before_action == "matching" and player == "hot" -> false
+
+      player == before_player and before_action == "getready" and action != "getready" -> true
+      player != before_player and before_action != "getready" and action == "getready" -> true
+
+      true -> false
+    end
   end
 end

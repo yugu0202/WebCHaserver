@@ -3,6 +3,7 @@ defmodule WebchaserverWeb.PageController do
 
   alias Webchaserver.Userclients
   alias Webchaserver.Usermatchs
+  alias Webchaserver.Matchresults
 
   def home(conn, _params) do
     # The home page is often custom made,
@@ -100,8 +101,15 @@ defmodule WebchaserverWeb.PageController do
   end
 
   def mymatch(conn, _params) do
-    matchs = Usermatchs.list_usermatchs_by_user_id(conn.assigns[:current_user].id)
+    matchs = Usermatchs.list_usermatchs_by_user_id_is_end(conn.assigns[:current_user].id)
+    results = matchs
+    |> Enum.map(fn(match) ->
+      match_id = match.match_id
+      player = match.player
+      matchresult = Matchresults.get_matchresult_by_match_id(match_id)
+      %{match_id: match_id, player: player, result: matchresult.result}
+    end)
 
-    render(conn, :mymatch, layout: false, matchs: matchs)
+    render(conn, :mymatch, layout: false, results: results)
   end
 end

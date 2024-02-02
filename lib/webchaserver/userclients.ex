@@ -113,6 +113,10 @@ defmodule Webchaserver.Userclients do
     Repo.delete(userclient)
   end
 
+  def delete_userclient_by_subtopic(subtopic) do
+    Repo.delete_all(from u in Userclient, where: u.subtopic == ^subtopic)
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking userclient changes.
 

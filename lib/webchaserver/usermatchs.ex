@@ -21,8 +21,12 @@ defmodule Webchaserver.Usermatchs do
     Repo.all(Usermatch)
   end
 
-  def list_usermatchs_by_user_id(user_id) do
-    Repo.all(from u in Usermatch, where: u.user_id == ^user_id, order_by: [asc: u.id])
+  def list_usermatchs_by_user_id_is_end(user_id) do
+    Repo.all(from u in Usermatch, where: u.user_id == ^user_id and u.is_end, order_by: [asc: u.id])
+  end
+
+  def list_usermatch_by_match_id(match_id) do
+    Repo.all(from u in Usermatch, where: u.match_id == ^match_id)
   end
 
   @doc """
@@ -90,15 +94,14 @@ defmodule Webchaserver.Usermatchs do
 
   """
   def update_usermatch(%Usermatch{} = usermatch, attrs) do
-    %Usermatch{}
+    usermatch
     |> Usermatch.changeset(attrs)
     |> Repo.update()
   end
 
-  def update_usermatch_end(id) do
-    get_usermatch!(id)
-    |> Usermatch.changeset(%{is_end: true})
-    |> Repo.update()
+  def update_usermatch_end(match_id) do
+    list_usermatch_by_match_id(match_id)
+    |> Enum.map(fn(x) -> update_usermatch(x, %{is_end: true}) end)
   end
 
   @doc """

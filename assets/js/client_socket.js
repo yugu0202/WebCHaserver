@@ -82,6 +82,10 @@ if (connectButton) {
       console.log(payload);
     });
 
+    channel.on("ready", (payload) => {
+      console.log(payload);
+    });
+
   });
 
   callButton.addEventListener("click", (event) => {
