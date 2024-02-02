@@ -1,0 +1,99 @@
+defmodule WebchaserverWeb.Router do
+  use WebchaserverWeb, :router
+
+  import WebchaserverWeb.UserAuth
+
+  pipeline :browser do
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:fetch_current_user)
+    plug(:put_root_layout, html: {WebchaserverWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
+  end
+
+  pipeline :api do
+    plug(:accepts, ["json"])
+  end
+
+  scope "/", WebchaserverWeb do
+    pipe_through(:browser)
+
+    get("/", PageController, :home)
+    get("/match", PageController, :match)
+  end
+
+  scope "/", WebchaserverWeb do
+    pipe_through([:browser, :require_authenticated_user])
+
+    get("/test", PageController, :test)
+    get("/token", PageController, :token)
+    get("/testverify", PageController, :testverify)
+    get("/mymatch", PageController, :mymatch)
+    get("viewmatch/:match_id", PageController, :viewmatch)
+  end
+
+  # Other scopes may use custom stacks.
+  scope "/api", WebchaserverWeb do
+    pipe_through(:api)
+
+    resources("/matchs", MatchController, except: [:new, :edit])
+    get("/logs", LogController, :index)
+  end
+
+  # Enable LiveDashboard and Swoosh mailbox preview in development
+  if Application.compile_env(:webchaserver, :dev_routes) do
+    # If you want to use the LiveDashboard in production, you should put
+    # it behind authentication and allow only admins to access it.
+    # If your application does not have an admins-only section yet,
+    # you can use Plug.BasicAuth to set up some basic authentication
+    # as long as you are also using SSL (which you should anyway).
+    import Phoenix.LiveDashboard.Router
+
+    scope "/dev" do
+      pipe_through(:browser)
+
+      live_dashboard("/dashboard", metrics: WebchaserverWeb.Telemetry)
+      forward("/mailbox", Plug.Swoosh.MailboxPreview)
+    end
+  end
+
+  ## Authentication routes
+
+  scope "/", WebchaserverWeb do
+    pipe_through([:browser, :redirect_if_user_is_authenticated])
+
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{WebchaserverWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      live("/users/register", UserRegistrationLive, :new)
+      live("/users/log_in", UserLoginLive, :new)
+      live("/users/reset_password", UserForgotPasswordLive, :new)
+      live("/users/reset_password/:token", UserResetPasswordLive, :edit)
+    end
+
+    post("/users/log_in", UserSessionController, :create)
+  end
+
+  scope "/", WebchaserverWeb do
+    pipe_through([:browser, :require_authenticated_user])
+
+    live_session :require_authenticated_user,
+      on_mount: [{WebchaserverWeb.UserAuth, :ensure_authenticated}] do
+      live("/users/settings", UserSettingsLive, :edit)
+      live("/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email)
+    end
+  end
+
+  scope "/", WebchaserverWeb do
+    pipe_through([:browser])
+
+    delete("/users/log_out", UserSessionController, :delete)
+
+    live_session :current_user,
+      on_mount: [{WebchaserverWeb.UserAuth, :mount_current_user}] do
+      live("/users/confirm/:token", UserConfirmationLive, :edit)
+      live("/users/confirm", UserConfirmationInstructionsLive, :new)
+    end
+  end
+end

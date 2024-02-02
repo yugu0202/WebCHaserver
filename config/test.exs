@@ -1,27 +1,30 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+config :pbkdf2_elixir, :rounds, 1
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :hello, Hello.Repo,
+config :webchaserver, Webchaserver.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "hello_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "webchaserver_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :hello, HelloWeb.Endpoint,
+config :webchaserver, WebchaserverWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "z2wnmuE4GcybL739p8QesNp+e885Q6t8odKB7W5I/p0q+pY6DLG8zP7ffkgF4Ebv",
+  secret_key_base: "aJ9EVlRUXad8QzWQnEPs1g8xwuEkMLHpkqJum752xr8uRQfWJ303SW6ikIW/Ua4N",
   server: false
 
 # In test we don't send emails.
-config :hello, Hello.Mailer, adapter: Swoosh.Adapters.Test
+config :webchaserver, Webchaserver.Mailer, adapter: Swoosh.Adapters.Test
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false

@@ -7,18 +7,18 @@
 # General application configuration
 import Config
 
-config :hello,
-  ecto_repos: [Hello.Repo]
+config :webchaserver,
+  ecto_repos: [Webchaserver.Repo]
 
 # Configures the endpoint
-config :hello, HelloWeb.Endpoint,
+config :webchaserver, WebchaserverWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    formats: [html: HelloWeb.ErrorHTML, json: HelloWeb.ErrorJSON],
+    formats: [html: WebchaserverWeb.ErrorHTML, json: WebchaserverWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Hello.PubSub,
-  live_view: [signing_salt: "SDMMqcGb"]
+  pubsub_server: Webchaserver.PubSub,
+  live_view: [signing_salt: "4UXNSw5v"]
 
 # Configures the mailer
 #
@@ -27,7 +27,7 @@ config :hello, HelloWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :hello, Hello.Mailer, adapter: Swoosh.Adapters.Local
+config :webchaserver, Webchaserver.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
@@ -41,7 +41,7 @@ config :esbuild,
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.2.7",
+  version: "3.3.2",
   default: [
     args: ~w(
       --config=tailwind.config.js

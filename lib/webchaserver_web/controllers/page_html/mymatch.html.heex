@@ -1,0 +1,4 @@
+
+<ul>
+    <li :for={result <- @results}><.link href={~p"/viewmatch/#{result.match_id}"}>Match ID: <%= result.match_id %> Character: <%= result.player %> Result: <%= result.result %></.link></li>
+</ul>
