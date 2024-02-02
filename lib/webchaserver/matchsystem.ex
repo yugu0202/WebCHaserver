@@ -21,7 +21,8 @@ defmodule Webchaserver.Matchsystem do
     IO.puts "match_id: #{match_id}"
     IO.puts "player: #{player}"
 
-    %{map_data: map, map_size: size} = log
+    %{map_data: map, map_size: size, turn: turn} = log
+    turn = turn - 1
 
     {my_pos, enemy_pos, my_score, enemy_score} =
       case player do
@@ -54,24 +55,48 @@ defmodule Webchaserver.Matchsystem do
         {map, my_score}
       end
 
-    is_end = if get_point(after_pos, map, hd(size), enemy_pos) == 2 do
-      enemy = case player do
-        "cool" -> "hot"
-        "hot" -> "cool"
+    is_end =
+      if get_point(after_pos, map, hd(size), enemy_pos) == 2 do
+        enemy = case player do
+          "cool" -> "hot"
+          "hot" -> "cool"
+        end
+        Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} bad walk", cool_score: my_score, hot_score: enemy_score})
+        true
+      else
+        false
       end
-      Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} bad walk", cool_score: my_score, hot_score: enemy_score})
-      true
-    else
-      false
-    end
 
     arround_data = get_arround(after_pos, map, hd(size), enemy_pos)
 
+    is_end =
     case player do
       "cool" ->
-        Logs.create_log(%{match_id: match_id, player: player, action: "walk"<>direction, return: arround_data, map_data: map, map_size: size, cool_pos: my_pos, hot_pos: enemy_pos, cool_score: my_score, hot_score: enemy_score})
+        Logs.create_log(%{match_id: match_id, player: player, action: "walk"<>direction, return: arround_data, map_data: map, map_size: size, turn: turn, cool_pos: after_pos, hot_pos: enemy_pos, cool_score: my_score, hot_score: enemy_score})
+        if turn == 0 and not is_end do
+          cond do
+            my_score > enemy_score -> Matchresults.create_matchresult(%{match_id: match_id, result: "cool win", reason: "turn end", cool_score: my_score, hot_score: enemy_score})
+            my_score < enemy_score -> Matchresults.create_matchresult(%{match_id: match_id, result: "hot win", reason: "turn end", cool_score: my_score, hot_score: enemy_score})
+            my_score == enemy_score -> Matchresults.create_matchresult(%{match_id: match_id, result: "draw", reason: "turn end", cool_score: my_score, hot_score: enemy_score})
+          end
+
+          true
+        else
+          is_end
+        end
       "hot" ->
-        Logs.create_log(%{match_id: match_id, player: player, action: "walk"<>direction, return: arround_data, map_data: map, map_size: size, cool_pos: enemy_pos, hot_pos: my_pos, hot_score: my_score, cool_score: enemy_score})
+        Logs.create_log(%{match_id: match_id, player: player, action: "walk"<>direction, return: arround_data, map_data: map, map_size: size, turn: turn, cool_pos: enemy_pos, hot_pos: after_pos, hot_score: my_score, cool_score: enemy_score})
+        if turn == 0 and not is_end do
+          cond do
+            my_score > enemy_score -> Matchresults.create_matchresult(%{match_id: match_id, result: "hot win", reason: "turn end", cool_score: enemy_score, hot_score: my_score})
+            my_score < enemy_score -> Matchresults.create_matchresult(%{match_id: match_id, result: "cool win", reason: "turn end", cool_score: enemy_score, hot_score: my_score})
+            my_score == enemy_score -> Matchresults.create_matchresult(%{match_id: match_id, result: "draw", reason: "turn end", cool_score: enemy_score, hot_score: my_score})
+          end
+
+          true
+        else
+          is_end
+        end
     end
 
     {[unless(is_end, do: 1, else: 0) | arround_data], is_end}
@@ -107,9 +132,7 @@ defmodule Webchaserver.Matchsystem do
 
     look_data = get_arround(look_pos, map, hd(size), enemy_pos)
 
-    Logs.create_log(%{match_id: match_id, player: player, action: "look"<>direction, return: look_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
-
-    {[1 | look_data], false}
+    act_end(player, "look"<>direction, look_data, map, log)
   end
 
 
@@ -135,9 +158,7 @@ defmodule Webchaserver.Matchsystem do
 
     search_data = search(my_pos, map, hd(size), enemy_pos, direction)
 
-    Logs.create_log(%{match_id: match_id, player: player, action: "search"<>direction, return: search_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
-
-    {[1 | search_data], false}
+    act_end(player, "search"<>direction, search_data, map, log)
   end
 
 
@@ -179,9 +200,7 @@ defmodule Webchaserver.Matchsystem do
 
     arround_data = get_arround(my_pos, map, hd(size), enemy_pos)
 
-    Logs.create_log(%{match_id: match_id, player: player, action: "put"<>direction, return: arround_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
-
-    {[unless(is_end, do: 1, else: 0) | arround_data], is_end}
+    act_end(player, "put"<>direction, arround_data, map, log, is_end)
   end
 
   def command(match_id, player, "getready", log) do
@@ -206,7 +225,7 @@ defmodule Webchaserver.Matchsystem do
 
     arround_data = get_arround(my_pos, map, hd(size), enemy_pos)
 
-    Logs.create_log(%{match_id: match_id, player: player, action: "getready", return: arround_data, map_data: map, map_size: size, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+    Logs.create_log(%{match_id: match_id, player: player, action: "getready", return: arround_data, map_data: map, map_size: size, turn: log.turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
 
     {[1 | arround_data], false}
   end
@@ -214,6 +233,25 @@ defmodule Webchaserver.Matchsystem do
   def command(_, _, _, _) do
     IO.puts "command not found"
     [0,0,0,0,0,0,0,0,0,0]
+  end
+
+  def act_end(player,action,ret_data,map,log,is_end \\ false) do
+    turn = log.turn - 1
+    Logs.create_log(%{match_id: log.match_id, player: player, action: action, return: ret_data, map_data: map, map_size: log.size, turn: turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+
+    is_end =
+    if turn == 0 and not is_end do
+      cond do
+        log.cool_score > log.hot_score -> Matchresults.create_matchresult(%{match_id: log.match_id, result: "cool win", reason: "turn end", cool_score: log.cool_score, hot_score: log.hot_score})
+        log.cool_score < log.hot_score -> Matchresults.create_matchresult(%{match_id: log.match_id, result: "hot win", reason: "turn end", cool_score: log.cool_score, hot_score: log.hot_score})
+        log.cool_score == log.hot_score -> Matchresults.create_matchresult(%{match_id: log.match_id, result: "draw", reason: "turn end", cool_score: log.cool_score, hot_score: log.hot_score})
+      end
+      true
+    else
+      is_end
+    end
+
+    {[unless(is_end, do: 1, else: 0) | ret_data], is_end}
   end
 
   def get_arround(pos, map, sizex, enemy_pos) do

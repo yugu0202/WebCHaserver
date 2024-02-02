@@ -9,6 +9,7 @@ defmodule Webchaserver.Logs.Log do
     field :return, {:array, :integer}
     field :map_data, {:array, {:array, :integer}}
     field :map_size, {:array, :integer}
+    field :turn, :integer
     field :cool_pos, {:array, :integer}
     field :hot_pos, {:array, :integer}
     field :cool_score, :integer
@@ -20,7 +21,7 @@ defmodule Webchaserver.Logs.Log do
   @doc false
   def changeset(log, attrs) do
     log
-    |> cast(attrs, [:match_id, :player, :action, :return, :map_data, :map_size, :cool_pos, :hot_pos, :cool_score, :hot_score])
-    |> validate_required([:match_id, :player, :action, :return, :map_data, :map_size, :cool_pos, :hot_pos, :cool_score, :hot_score])
+    |> cast(attrs, [:match_id, :player, :action, :return, :map_data, :map_size, :turn, :cool_pos, :hot_pos, :cool_score, :hot_score])
+    |> validate_required([:match_id, :player, :action, :return, :map_data, :map_size, :turn, :cool_pos, :hot_pos, :cool_score, :hot_score])
   end
 end

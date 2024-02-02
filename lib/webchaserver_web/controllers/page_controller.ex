@@ -4,6 +4,7 @@ defmodule WebchaserverWeb.PageController do
   alias Webchaserver.Userclients
   alias Webchaserver.Usermatchs
   alias Webchaserver.Matchresults
+  alias Webchaserver.Logs
 
   def home(conn, _params) do
     # The home page is often custom made,
@@ -111,5 +112,11 @@ defmodule WebchaserverWeb.PageController do
     end)
 
     render(conn, :mymatch, layout: false, results: results)
+  end
+
+  def viewmatch(conn, %{"match_id" => match_id}) do
+    logs = Logs.list_logs_by_match_id(match_id)
+    matchresult = Matchresults.get_matchresult_by_match_id(match_id)
+    render(assign(assign(conn, :match_id, match_id), :is_view, "true"), :viewmatch, layout: false, logs: logs, matchresult: matchresult)
   end
 end

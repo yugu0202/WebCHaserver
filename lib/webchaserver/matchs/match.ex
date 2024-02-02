@@ -7,6 +7,7 @@ defmodule Webchaserver.Matchs.Match do
     field :hot_pos, {:array, :integer}
     field :map, {:array, {:array, :integer}}
     field :size, {:array, :integer}
+    field :turn, :integer
 
     timestamps()
   end
@@ -14,7 +15,7 @@ defmodule Webchaserver.Matchs.Match do
   @doc false
   def changeset(match, attrs) do
     match
-    |> cast(attrs, [:map, :cool_pos, :hot_pos, :size])
-    |> validate_required([:map, :cool_pos, :hot_pos, :size])
+    |> cast(attrs, [:map, :cool_pos, :hot_pos, :size, :turn])
+    |> validate_required([:map, :cool_pos, :hot_pos, :size, :turn])
   end
 end

@@ -92,7 +92,7 @@ if (connectButton) {
     console.log("Call button pressed");
     action = actionInput.value;
     actionInput.value = "";
-    channel.push("call", {action: action});
+    channel.push("call", {action: action}).receive("ok", (resp) => {console.log(resp)});
   });
 }
 

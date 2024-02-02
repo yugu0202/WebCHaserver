@@ -8,6 +8,7 @@ defmodule Webchaserver.Repo.Migrations.CreateLogs do
       add :action, :string
       add :map_data, {:array, {:array, :integer}}
       add :map_size, {:array, :integer}
+      add :turn, :integer
       add :cool_pos, {:array, :integer}
       add :hot_pos, {:array, :integer}
       add :cool_score, :integer

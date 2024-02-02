@@ -7,6 +7,7 @@ defmodule Webchaserver.Repo.Migrations.CreateMatchs do
       add :cool_pos, {:array, :integer}
       add :hot_pos, {:array, :integer}
       add :size, {:array, :integer}
+      add :turn, :integer
 
       timestamps()
     end

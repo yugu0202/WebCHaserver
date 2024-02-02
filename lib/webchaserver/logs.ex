@@ -21,6 +21,10 @@ defmodule Webchaserver.Logs do
     Repo.all(Log)
   end
 
+  def list_logs_by_match_id(match_id) do
+    Repo.all(from u in Log, where: u.match_id == ^match_id, order_by: [asc: u.id])
+  end
+
   @doc """
   Gets a single log.
 
