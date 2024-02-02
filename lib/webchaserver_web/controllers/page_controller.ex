@@ -115,8 +115,6 @@ defmodule WebchaserverWeb.PageController do
   end
 
   def viewmatch(conn, %{"match_id" => match_id}) do
-    logs = Logs.list_logs_by_match_id(match_id)
-    matchresult = Matchresults.get_matchresult_by_match_id(match_id)
-    render(assign(assign(conn, :match_id, match_id), :is_view, "true"), :viewmatch, layout: false, logs: logs, matchresult: matchresult)
+    render(assign(assign(conn, :match_id, match_id), :is_view, "true"), :viewmatch, layout: false)
   end
 end
