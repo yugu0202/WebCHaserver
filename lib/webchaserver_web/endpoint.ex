@@ -23,7 +23,7 @@ defmodule WebchaserverWeb.Endpoint do
     at: "/",
     from: :webchaserver,
     gzip: false,
-    #only: WebchaserverWeb.static_paths()
+    only: WebchaserverWeb.static_paths()
   )
 
   # Code reloading can be explicitly enabled under the
