@@ -9,6 +9,7 @@
                                 <th class="px-5 py-3 text-xs font-medium text-left uppercase">Match ID</th>
                                 <th class="px-5 py-3 text-xs font-medium text-left uppercase">Your Character</th>
                                 <th class="px-5 py-3 text-xs font-medium text-left uppercase">Result</th>
+                                <th class="px-5 py-3 text-xs font-medium text-left uppercase">Date</th>
                                 <th class="px-5 py-3 text-xs font-medium text-right uppercase">Action</th>
                             </tr>
                         </thead>
@@ -17,6 +18,7 @@
                                 <td class="px-5 py-4 text-sm font-medium whitespace-nowrap"><%= result.match_id %></td>
                                 <td class="px-5 py-4 text-sm whitespace-nowrap"><%= result.player %></td>
                                 <td class="px-5 py-4 text-sm whitespace-nowrap"><%= result.result %></td>
+                                <td class="px-5 py-4 text-sm whitespace-nowrap"><%= result.date %></td>
                                 <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
                                     <.link class="text-blue-600 hover:text-blue-700" href={~p"/viewmatch/#{result.match_id}"}>View</.link>
                                 </td>

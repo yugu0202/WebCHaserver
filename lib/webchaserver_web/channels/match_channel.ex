@@ -46,8 +46,10 @@ defmodule WebchaserverWeb.MatchChannel do
     member = Presence.list(socket) |> map_size()
 
     case {action, member} do
-      {_, 1} ->
+      {"matching", 1} ->
         {:reply,{:ok, %{data: "waiting"}}, socket}
+      {_, 1} ->
+        {:stop, :shutdown, socket}
       {"matching", 2} ->
         users = Enum.map(Presence.list(socket), fn(x) -> Kernel.elem(x, 0) end)
 
@@ -83,10 +85,20 @@ defmodule WebchaserverWeb.MatchChannel do
 
           {:ok, %{id: id}} = Matchs.create_match(%{map: mapdata, cool_pos: cool_pos, hot_pos: hot_pos, size: size, turn: turn})
           Logs.create_log(%{match_id: id, player: "cool", action: "matching", return: [], map_data: mapdata, map_size: size,turn: turn, cool_pos: cool_pos, hot_pos: hot_pos, cool_score: 0, hot_score: 0})
-          Usermatchs.create_usermatch2(%{user_id: hd(users), match_id: id, player: "cool"}, %{user_id: Enum.at(users, 1), match_id: id, player: "hot"})
+
+          %{id: register_id} = Userclients.get_userclient_by_user_id(hd(users))
+
+          %{id: first_register_id} = Userclients.get_userclient_by_subtopic(String.replace(socket.topic, "match:", ""))
+
+          if register_id == first_register_id do
+            Usermatchs.create_usermatch2(%{user_id: hd(users), match_id: id, player: "cool"}, %{user_id: Enum.at(users, 1), match_id: id, player: "hot"})
+          else
+            Usermatchs.create_usermatch2(%{user_id: hd(users), match_id: id, player: "hot"}, %{user_id: Enum.at(users, 1), match_id: id, player: "cool"})
+          end
+
+          broadcast(socket, "ready", %{data: "cool"})
         end
 
-        broadcast(socket, "ready", %{data: "cool"})
         {:noreply, socket}
       {_, 2} ->
         unless Usermatchs.exist_usermatch_by_user_id_not_end(socket.assigns.user_id) do
@@ -110,10 +122,9 @@ defmodule WebchaserverWeb.MatchChannel do
           if is_end do
             Usermatchs.update_usermatch_end(id)
             Userclients.delete_userclient_by_subtopic(String.replace(socket.topic, "match:", ""))
-            {:stop, :shutdown, socket}
-          else
-            {:reply,{:ok, %{data: ret}}, socket}
           end
+
+          {:reply,{:ok, %{data: ret}}, socket}
         end
     end
   end

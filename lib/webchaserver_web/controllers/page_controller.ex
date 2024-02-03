@@ -4,7 +4,6 @@ defmodule WebchaserverWeb.PageController do
   alias Webchaserver.Userclients
   alias Webchaserver.Usermatchs
   alias Webchaserver.Matchresults
-  alias Webchaserver.Logs
 
   def home(conn, _params) do
     # The home page is often custom made,
@@ -102,13 +101,16 @@ defmodule WebchaserverWeb.PageController do
   end
 
   def mymatch(conn, _params) do
+    month_format = %{1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr", 5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug", 9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec"}
     matchs = Usermatchs.list_usermatchs_by_user_id_is_end(conn.assigns[:current_user].id)
     results = matchs
     |> Enum.map(fn(match) ->
       match_id = match.match_id
       player = match.player
       matchresult = Matchresults.get_matchresult_by_match_id(match_id)
-      %{match_id: match_id, player: player, result: matchresult.result}
+      jst = DateTime.from_naive!(matchresult.inserted_at, "Asia/Tokyo")
+      date = "#{jst.year} #{month_format[jst.month]} #{jst.day} #{jst.hour |> Integer.to_string() |> String.pad_leading(2, "0")}:#{jst.minute |> Integer.to_string() |> String.pad_leading(2, "0")}"
+      %{match_id: match_id, player: player, result: matchresult.result, date: date}
     end)
 
     render(conn, :mymatch, layout: false, results: results)
