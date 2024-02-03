@@ -1,30 +1,29 @@
-
-<ul>
-    <li :for={result <- @results}><.link href={~p"/viewmatch/#{result.match_id}"}>Match ID: <%= result.match_id %> Character: <%= result.player %> Result: <%= result.result %></.link></li>
-</ul>
-
-<div class="flex flex-col">
-    <div class="overflow-x-auto">
-        <div class="inline-block min-w-full">
-            <div class="overflow-hidden">
-                <table class="min-w-full divide-y divide-neutral-200">
-                    <thead>
-                        <tr class="text-neutral-500">
-                            <th class="px-5 py-3 text-xs font-medium text-left uppercase">Match ID</th>
-                            <th class="px-5 py-3 text-xs font-medium text-left uppercase">Result</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-200">
-                        <tr :for={result <- @results} class="text-neutral-800">
-                            <td class="px-5 py-4 text-sm font-medium whitespace-nowrap"><%= result.match_id %></td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap"><%= result.result %></td>
-                            <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <.link class="text-blue-600 hover:text-blue-700" href={~p"/viewmatch/#{result.match_id}"}>View</.link>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+<div>
+    <div class="flex flex-col mx-auto w-full lg:w-1/2 border">
+        <div class="overflow-x-auto">
+            <div class="inline-block min-w-full">
+                <div class="overflow-hidden">
+                    <table class="min-w-full divide-y divide-neutral-200">
+                        <thead>
+                            <tr class="text-neutral-500">
+                                <th class="px-5 py-3 text-xs font-medium text-left uppercase">Match ID</th>
+                                <th class="px-5 py-3 text-xs font-medium text-left uppercase">Your Character</th>
+                                <th class="px-5 py-3 text-xs font-medium text-left uppercase">Result</th>
+                                <th class="px-5 py-3 text-xs font-medium text-right uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-200">
+                            <tr :for={result <- @results} class="text-neutral-800">
+                                <td class="px-5 py-4 text-sm font-medium whitespace-nowrap"><%= result.match_id %></td>
+                                <td class="px-5 py-4 text-sm whitespace-nowrap"><%= result.player %></td>
+                                <td class="px-5 py-4 text-sm whitespace-nowrap"><%= result.result %></td>
+                                <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
+                                    <.link class="text-blue-600 hover:text-blue-700" href={~p"/viewmatch/#{result.match_id}"}>View</.link>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
