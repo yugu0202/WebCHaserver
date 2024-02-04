@@ -1,15 +1,17 @@
 defmodule WebchaserverWeb.PageController do
   use WebchaserverWeb, :controller
+  use Params
 
   alias Webchaserver.Userclients
   alias Webchaserver.Usermatchs
   alias Webchaserver.Matchresults
-  alias Webchaserver.Logs
 
   def home(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
-    render(conn, :home, layout: false)
+    conn
+    |> put_layout(html: false)
+    |> render(:home)
   end
 
   def test(conn, _params) do
@@ -50,7 +52,7 @@ defmodule WebchaserverWeb.PageController do
     render(assign(conn, :user_token, token), :test, layout: false)
   end
 
-  def token(conn, _params) do
+  def gettoken(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
 
@@ -87,36 +89,85 @@ defmodule WebchaserverWeb.PageController do
         user.subtopic
       end
 
-    render(assign(conn, :user_token, token), :token, layout: false, subtopic: subtopic)
+    render(assign(conn, :user_token, token), :gettoken, layout: false, subtopic: subtopic)
   end
 
-  def testverify(conn, %{ "token" => token }) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    case Phoenix.Token.verify(conn, "user", token) do
-      {:ok, user_id} ->
-        render(conn, :testverify, layout: false, user_id: user_id)
-      {:error, _} ->
-        render(conn, :testverify, layout: false, user_id: nil)
+  defparams match_filter %{
+    "page" => [field: :integer, default: 1],
+    "character" => :string,
+    "result" => :string,
+    "date" => :utc_datetime
+  }
+
+  def mymatch(conn, params \\ %{}) do
+    month_format = %{1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr", 5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug", 9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec"}
+    enemy_format = %{"cool" => "hot", "hot" => "cool"}
+
+    changeset = match_filter(params)
+    filter = if changeset.valid? do
+      Params.data changeset
+    else
+      match_filter(%{}).data
     end
-  end
 
-  def mymatch(conn, _params) do
-    matchs = Usermatchs.list_usermatchs_by_user_id_is_end(conn.assigns[:current_user].id)
+    page = filter.page
+
+    page = if page < 1 do
+      1
+    else
+      page
+    end
+
+    character = case filter.character do
+      "cool" ->
+        filter.character
+      "hot" ->
+        filter.character
+      _ ->
+        nil
+    end
+
+    matchs = Usermatchs.list_usermatchs_by_user_id_is_end(conn.assigns[:current_user].id,%{player: character})
+
+    date = filter.date
+
     results = matchs
     |> Enum.map(fn(match) ->
-      match_id = match.match_id
       player = match.player
-      matchresult = Matchresults.get_matchresult_by_match_id(match_id)
-      %{match_id: match_id, player: player, result: matchresult.result}
-    end)
 
-    render(conn, :mymatch, layout: false, results: results)
+      result = case filter.result do
+        "win" ->
+          player <> " " <> filter.result
+        "lose" ->
+          enemy_format[player] <> " win"
+        "draw" ->
+          filter.result
+        _ ->
+          nil
+      end
+
+      match_id = match.match_id
+      case Matchresults.get_matchresult_by_match_id(match_id,%{result: result, inserted_at: date}) do
+        nil ->
+          nil
+        matchresult ->
+          jst = DateTime.from_naive!(matchresult.inserted_at, "Asia/Tokyo")
+          date = "#{jst.year} #{month_format[jst.month]} #{jst.day} #{jst.hour |> Integer.to_string() |> String.pad_leading(2, "0")}:#{jst.minute |> Integer.to_string() |> String.pad_leading(2, "0")}"
+          %{match_id: match_id, player: player, result: matchresult.result, date: date}
+      end
+    end)
+    |> Enum.filter(fn(x) -> x != nil end)
+
+    page_count = Enum.count(results) |> div(10) |> Kernel.+(1)
+
+    render(conn, :mymatch, layout: false, results: results, page: page, page_count: page_count)
   end
 
   def viewmatch(conn, %{"match_id" => match_id}) do
-    logs = Logs.list_logs_by_match_id(match_id)
-    matchresult = Matchresults.get_matchresult_by_match_id(match_id)
-    render(assign(assign(conn, :match_id, match_id), :is_view, "true"), :viewmatch, layout: false, logs: logs, matchresult: matchresult)
+    render(assign(assign(conn, :match_id, match_id), :is_view, "true"), :viewmatch, layout: false)
+  end
+
+  def creatematch(conn, _params) do
+    render(conn, :creatematch, layout: false)
   end
 end

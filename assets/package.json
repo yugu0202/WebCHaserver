@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@alpinejs/collapse": "^3.13.5",
+    "@alpinejs/focus": "^3.13.5",
+    "alpinejs": "^3.13.5"
+  }
+}

@@ -28,10 +28,10 @@ defmodule WebchaserverWeb.Router do
     pipe_through([:browser, :require_authenticated_user])
 
     get("/test", PageController, :test)
-    get("/token", PageController, :token)
-    get("/testverify", PageController, :testverify)
+    get("/gettoken", PageController, :gettoken)
     get("/mymatch", PageController, :mymatch)
     get("viewmatch/:match_id", PageController, :viewmatch)
+    get("/creatematch", PageController, :creatematch)
   end
 
   # Other scopes may use custom stacks.
@@ -39,7 +39,8 @@ defmodule WebchaserverWeb.Router do
     pipe_through(:api)
 
     resources("/matchs", MatchController, except: [:new, :edit])
-    get("/logs", LogController, :index)
+    get("/logs/:match_id", LogController, :index)
+    get("/matchresults/:match_id", MatchresultController, :show)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

@@ -2,8 +2,6 @@
 // to get started and then uncomment the line below.
 // import "./user_socket.js"
 import "./client_socket.js";
-import "./enchant.min.js";
-import "./viewer.js";
 
 // You can include dependencies in two ways.
 //
@@ -25,11 +23,29 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 
+import Alpine from "alpinejs";
+import collapse from "@alpinejs/collapse";
+import focus from "@alpinejs/focus";
+
+import "./enchant.min.js";
+import "./viewer.js";
+
+Alpine.plugin([collapse, focus]);
+window.Alpine = Alpine;
+Alpine.start();
+
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
+  dom: {
+    onBeforeElUpdated(from, to) {
+      if (from._x_dataStack) {
+        window.Alpine.clone(from, to);
+      }
+    },
+  },
 });
 
 // Show progress bar on live navigation and form submits
