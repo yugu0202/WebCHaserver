@@ -45,6 +45,8 @@ defmodule WebchaserverWeb.MatchChannel do
     IO.puts "action #{action}"
     member = Presence.list(socket) |> map_size()
 
+    IO.inspect(Presence.list(socket))
+
     case {action, member} do
       {"matching", 1} ->
         {:reply,{:ok, %{data: "waiting"}}, socket}
