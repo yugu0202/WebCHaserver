@@ -38,7 +38,7 @@ defmodule WebchaserverWeb.ClientSocket do
     case Phoenix.Token.verify(socket, "user", token, max_age: 86400) do
       {:ok, id} ->
         {:ok, assign(socket, :user_id, id)}
-      {:error, reason} ->
+      {:error, _reason} ->
         :error
       end
   end
