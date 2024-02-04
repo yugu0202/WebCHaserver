@@ -243,7 +243,7 @@ defmodule Webchaserver.Matchsystem do
 
   def act_end(player,action,ret_data,map,log,is_end \\ false) do
     turn = log.turn - 1
-    Logs.create_log(%{match_id: log.match_id, player: player, action: action, return: ret_data, map_data: map, map_size: log.size, turn: turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+    Logs.create_log(%{match_id: log.match_id, player: player, action: action, return: ret_data, map_data: map, map_size: log.map_size, turn: turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
 
     is_end = if if(player == "cool", do: log.cool_pos, else: log.hot_pos) |> check_arround_block(map) do
       enemy = if player == "cool", do: "hot", else: "cool"
