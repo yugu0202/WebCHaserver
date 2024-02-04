@@ -68,7 +68,9 @@ let channel = null;
 if (connectButton) {
   connectButton.addEventListener("click", (event) => {
     console.log("connect");
-    channel = socket.channel("match:1");
+    topic = actionInput.value;
+    actionInput.value = "";
+    channel = socket.channel("match:"+topic);
     channel
       .join()
       .receive("ok", (resp) => {
