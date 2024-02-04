@@ -25,11 +25,12 @@ import topbar from "../vendor/topbar";
 
 import Alpine from "alpinejs";
 import collapse from "@alpinejs/collapse";
+import focus from "@alpinejs/focus";
 
 import "./enchant.min.js";
 import "./viewer.js";
 
-Alpine.plugin(collapse);
+Alpine.plugin([collapse, focus]);
 window.Alpine = Alpine;
 Alpine.start();
 

@@ -37,8 +37,15 @@ defmodule Webchaserver.Matchresults do
   """
   def get_matchresult!(id), do: Repo.get!(Matchresult, id)
 
-  def get_matchresult_by_match_id(match_id) do
-    Repo.one(from u in Matchresult, where: ^match_id == u.match_id)
+  def get_matchresult_by_match_id(match_id, opt \\ %{}) do
+    opt = opt
+    |> Map.filter(fn {_, v} -> v != nil end)
+    |> Map.put(:match_id, match_id)
+    |> Enum.map(fn {k, v} -> {k, v} end)
+
+    IO.inspect(opt)
+
+    Repo.one(from u in Matchresult, where: ^opt)
   end
 
   @doc """

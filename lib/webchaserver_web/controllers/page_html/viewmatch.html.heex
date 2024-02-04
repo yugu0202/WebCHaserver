@@ -1,1 +1,57 @@
-<div id="enchant-stage"></div>
+<div>
+    <.myheader current_user={@current_user} />
+
+    <div id="result-monitor" class="flex mx-auto w-full lg:w-1/2 border my-10">
+        <div id="enchant-stage" class=""></div>
+
+        <div class="flex">
+            <div id="enchant-ui" class="flex flex-col px-5 text-2xl">
+                <p id="turn"></p>
+                <div class="flex">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                        <div id="turn-progress" class="bg-black h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+                <p id="cool-score"></p>
+                <p id="hot-score"></p>
+                <p id="result"></p>
+                <p id="reason"></p>
+
+                <div class="flex flex-col justify-end h-full text-xl">
+                    <span>Controls</span>
+
+                    <div class="flex">
+                        <span>Next Turn</span>
+                        <span class="ml-auto text-l tracking-widest text-neutral-400 group-hover:text-neutral-600">&rarr;</span>
+                    </div>
+
+                    <div class="flex">
+                        <span>Prev Turn</span>
+                        <span class="ml-auto text-l tracking-widest text-neutral-400 group-hover:text-neutral-600">&larr;</span>
+                    </div>
+
+                    <div class="flex">
+                        <span>First Turn</span>
+                        <span class="ml-auto text-l tracking-widest text-neutral-400 group-hover:text-neutral-600">&darr;</span>
+                    </div>
+
+                    <div class="flex">
+                        <span>Last Turn</span>
+                        <span class="ml-auto text-l tracking-widest text-neutral-400 group-hover:text-neutral-600">&uarr;</span>
+                    </div>
+
+                    <div class="flex">
+                        <span>Play Auto Toggle</span>
+                        <span class="ml-auto text-l tracking-widest text-neutral-400 group-hover:text-neutral-600">&crarr;</span>
+                    </div>
+
+                    <div class="flex">
+                        <span>Reverse Auto Toggle</span>
+                        <span class="ml-auto text-l tracking-widest text-neutral-400 group-hover:text-neutral-600">&#8679;+&crarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

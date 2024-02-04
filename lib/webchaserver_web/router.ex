@@ -39,7 +39,8 @@ defmodule WebchaserverWeb.Router do
     pipe_through(:api)
 
     resources("/matchs", MatchController, except: [:new, :edit])
-    get("/logs", LogController, :index)
+    get("/logs/:match_id", LogController, :index)
+    get("/matchresults/:match_id", MatchresultController, :show)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
