@@ -69,6 +69,14 @@ defmodule Webchaserver.Matchsystem do
 
     arround_data = get_arround(after_pos, map, hd(size), enemy_pos)
 
+    is_end = if check_arround_block(after_pos, map) do
+      enemy = if player == "cool", do: "hot", else: "cool"
+      Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} arround block", cool_score: my_score, hot_score: enemy_score})
+      true
+    else
+      is_end
+    end
+
     is_end =
     case player do
       "cool" ->
@@ -225,9 +233,7 @@ defmodule Webchaserver.Matchsystem do
 
     arround_data = get_arround(my_pos, map, hd(size), enemy_pos)
 
-    Logs.create_log(%{match_id: match_id, player: player, action: "getready", return: arround_data, map_data: map, map_size: size, turn: log.turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
-
-    {[1 | arround_data], false}
+    act_end(player, "getready", arround_data, map, log)
   end
 
   def command(_, _, _, _) do
@@ -238,6 +244,14 @@ defmodule Webchaserver.Matchsystem do
   def act_end(player,action,ret_data,map,log,is_end \\ false) do
     turn = log.turn - 1
     Logs.create_log(%{match_id: log.match_id, player: player, action: action, return: ret_data, map_data: map, map_size: log.size, turn: turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
+
+    is_end = if if(player == "cool", do: log.cool_pos, else: log.hot_pos) |> check_arround_block(map) do
+      enemy = if player == "cool", do: "hot", else: "cool"
+      Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} arround block", cool_score: my_score, hot_score: enemy_score})
+      true
+    else
+      is_end
+    end
 
     is_end =
     if turn == 0 and not is_end do
@@ -293,6 +307,15 @@ defmodule Webchaserver.Matchsystem do
       map
     else
       List.replace_at(map, y, List.replace_at(Enum.at(map, y), x, value))
+    end
+  end
+
+  def check_arround_block(pos, map) do
+    [x, y] = pos
+    if Enum.all?([Enum.at(Enum.at(map, y-1), x), Enum.at(Enum.at(map, y+1), x), Enum.at(Enum.at(map, y), x-1), Enum.at(Enum.at(map, y), x+1)], fn(x) -> x == 2 end) do
+      true
+    else
+      false
     end
   end
 
