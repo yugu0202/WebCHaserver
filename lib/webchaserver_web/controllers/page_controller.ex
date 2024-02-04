@@ -52,7 +52,7 @@ defmodule WebchaserverWeb.PageController do
     render(assign(conn, :user_token, token), :test, layout: false)
   end
 
-  def token(conn, _params) do
+  def gettoken(conn, _params) do
     # The home page is often custom made,
     # so skip the default app layout.
 
@@ -89,7 +89,7 @@ defmodule WebchaserverWeb.PageController do
         user.subtopic
       end
 
-    render(assign(conn, :user_token, token), :token, layout: false, subtopic: subtopic)
+    render(assign(conn, :user_token, token), :gettoken, layout: false, subtopic: subtopic)
   end
 
   defparams match_filter %{
@@ -101,6 +101,7 @@ defmodule WebchaserverWeb.PageController do
 
   def mymatch(conn, params \\ %{}) do
     month_format = %{1 => "Jan", 2 => "Feb", 3 => "Mar", 4 => "Apr", 5 => "May", 6 => "Jun", 7 => "Jul", 8 => "Aug", 9 => "Sep", 10 => "Oct", 11 => "Nov", 12 => "Dec"}
+    enemy_format = %{"cool" => "hot", "hot" => "cool"}
 
     changeset = match_filter(params)
     filter = if changeset.valid? do
@@ -138,7 +139,7 @@ defmodule WebchaserverWeb.PageController do
         "win" ->
           player <> " " <> filter.result
         "lose" ->
-          player <> " " <> filter.result
+          enemy_format[player] <> " win"
         "draw" ->
           filter.result
         _ ->
@@ -164,5 +165,9 @@ defmodule WebchaserverWeb.PageController do
 
   def viewmatch(conn, %{"match_id" => match_id}) do
     render(assign(assign(conn, :match_id, match_id), :is_view, "true"), :viewmatch, layout: false)
+  end
+
+  def creatematch(conn, _params) do
+    render(conn, :creatematch, layout: false)
   end
 end

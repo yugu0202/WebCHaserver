@@ -28,10 +28,10 @@ defmodule WebchaserverWeb.Router do
     pipe_through([:browser, :require_authenticated_user])
 
     get("/test", PageController, :test)
-    get("/token", PageController, :token)
-    get("/testverify", PageController, :testverify)
+    get("/gettoken", PageController, :gettoken)
     get("/mymatch", PageController, :mymatch)
     get("viewmatch/:match_id", PageController, :viewmatch)
+    get("/creatematch", PageController, :creatematch)
   end
 
   # Other scopes may use custom stacks.

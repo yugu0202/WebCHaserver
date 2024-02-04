@@ -1,7 +1,7 @@
 <div>
     <.myheader current_user={@current_user} />
 
-    <div class="flex flex-col mx-auto w-full lg:w-1/2 border rounded my-10">
+    <div class="flex flex-col mx-auto w-full lg:w-1/2 border rounded">
         <div class="flex flex-row-reverse border">
             <div x-data="{
                     menuBarOpen: false, 
@@ -115,7 +115,15 @@
         </div>
 
         <div class="flex items-center justify-between w-full h-16 px-3 border-t border-neutral-200">
-            <p class="pl-2 text-sm text-gray-700">Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium"><%= Kernel.length(@results) %></span> results</p>
+            <p class="pl-2 text-sm text-gray-700">
+                Showing 
+                <span class="font-medium"><%= (@page-1)*10+1 %></span>
+                 to 
+                <span class="font-medium"><%= if @page*10 > Kernel.length(@results), do: Kernel.length(@results), else: @page*10 %></span>
+                 of 
+                <span class="font-medium"><%= Kernel.length(@results) %></span>
+                 results
+            </p>
             <nav>
                 <ul x-data="{}" class="flex items-center text-sm leading-tight bg-white border divide-x rounded h-9 text-neutral-500 divide-neutral-200 border-neutral-200">
                     <li class="h-full">

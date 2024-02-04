@@ -21,8 +21,14 @@ defmodule WebchaserverWeb.PageHTML do
             </a>
 
             <%= if @current_user do %>
+              <.link href={~p"/gettoken"} class="mr-5 font-medium leading-6 text-gray-600 hover:text-gray-900">
+                Get Token
+              </.link>
               <.link href={~p"/mymatch"} class="mr-5 font-medium leading-6 text-gray-600 hover:text-gray-900">
                 My Match
+              </.link>
+              <.link href={~p"/creatematch"} class="mr-5 font-medium leading-6 text-gray-600 hover:text-gray-900">
+                Create Match
               </.link>
             <% end %>
 
