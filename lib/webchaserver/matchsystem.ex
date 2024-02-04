@@ -69,7 +69,7 @@ defmodule Webchaserver.Matchsystem do
 
     arround_data = get_arround(after_pos, map, hd(size), enemy_pos)
 
-    is_end = if check_arround_block(after_pos, map) do
+    is_end = if check_arround_block(after_pos, map, hd(size)) do
       enemy = if player == "cool", do: "hot", else: "cool"
       Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} arround block", cool_score: my_score, hot_score: enemy_score})
       true
@@ -245,7 +245,7 @@ defmodule Webchaserver.Matchsystem do
     turn = log.turn - 1
     Logs.create_log(%{match_id: log.match_id, player: player, action: action, return: ret_data, map_data: map, map_size: log.map_size, turn: turn, cool_pos: log.cool_pos, hot_pos: log.hot_pos, cool_score: log.cool_score, hot_score: log.hot_score})
 
-    is_end = if if(player == "cool", do: log.cool_pos, else: log.hot_pos) |> check_arround_block(map) do
+    is_end = if if(player == "cool", do: log.cool_pos, else: log.hot_pos) |> check_arround_block(map, hd(log.map_size)) do
       enemy = if player == "cool", do: "hot", else: "cool"
       Matchresults.create_matchresult(%{match_id: log.match_id, result: "#{enemy} win", reason: "#{player} arround block", cool_score: log.cool_score, hot_score: log.hot_score})
       true
@@ -310,9 +310,9 @@ defmodule Webchaserver.Matchsystem do
     end
   end
 
-  def check_arround_block(pos, map) do
+  def check_arround_block(pos, map, sizex) do
     [x, y] = pos
-    if Enum.all?([Enum.at(Enum.at(map, y-1), x), Enum.at(Enum.at(map, y+1), x), Enum.at(Enum.at(map, y), x-1), Enum.at(Enum.at(map, y), x+1)], fn(x) -> x == 2 end) do
+    if Enum.all?([get_point([x-1, y], map, sizex, [nil, nil]), get_point([x+1, y], map, sizex, [nil, nil]), get_point([x, y-1], map, sizex, [nil, nil]), get_point([x, y+1], map, sizex, [nil, nil])], fn(x) -> x == 2 end) do
       true
     else
       false
