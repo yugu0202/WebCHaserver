@@ -54,7 +54,7 @@ defmodule Webchaserver.Userclients do
   def get_userclient_by_user_id(user_id), do: Repo.get_by(Userclient, user_id: user_id)
 
   def get_userclient_latest2() do
-    Repo.all(from u in Userclient, order_by: [asc: u.id], limit: 2)
+    Repo.all(from u in Userclient, order_by: [desc: u.id], limit: 2)
   end
 
   def get_userclient_by_subtopic(subtopic) do

@@ -79,7 +79,7 @@ defmodule WebchaserverWeb.PageController do
             if first.subtopic == second.subtopic do
               String.to_integer(first.subtopic) + 1 |> Integer.to_string()
             else
-              second.subtopic
+              first.subtopic
             end
         end
 
