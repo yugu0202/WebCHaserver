@@ -158,7 +158,7 @@ defmodule WebchaserverWeb.PageController do
     end)
     |> Enum.filter(fn(x) -> x != nil end)
 
-    page_count = Enum.count(results) |> div(10) |> Kernel.+(1)
+    page_count = Enum.count(results) |> div(11) |> Kernel.+(1)
 
     render(conn, :mymatch, layout: false, results: results, page: page, page_count: page_count)
   end
