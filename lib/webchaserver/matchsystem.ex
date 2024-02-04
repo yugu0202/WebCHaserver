@@ -247,7 +247,7 @@ defmodule Webchaserver.Matchsystem do
 
     is_end = if if(player == "cool", do: log.cool_pos, else: log.hot_pos) |> check_arround_block(map) do
       enemy = if player == "cool", do: "hot", else: "cool"
-      Matchresults.create_matchresult(%{match_id: match_id, result: "#{enemy} win", reason: "#{player} arround block", cool_score: log.cool_score, hot_score: log.hot_score})
+      Matchresults.create_matchresult(%{match_id: log.match_id, result: "#{enemy} win", reason: "#{player} arround block", cool_score: log.cool_score, hot_score: log.hot_score})
       true
     else
       is_end
