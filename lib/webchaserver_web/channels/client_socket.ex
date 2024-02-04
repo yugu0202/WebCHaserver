@@ -34,7 +34,7 @@ defmodule WebchaserverWeb.ClientSocket do
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
   @impl true
-  def connect(%{"token" => token} = params, socket, _connect_info) do
+  def connect(%{"token" => token}, socket, _connect_info) do
     case Phoenix.Token.verify(socket, "user", token, max_age: 86400) do
       {:ok, id} ->
         {:ok, assign(socket, :user_id, id)}
