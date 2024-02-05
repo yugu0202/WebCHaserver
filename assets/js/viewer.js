@@ -147,7 +147,7 @@ if (window.is_view)
 
                 if(core.input.right && right_count%10 == 0 && pointer < log.length - 1)
                 {
-                    pointer += 2;
+                    pointer += 1;
                     turn = log[pointer].turn;
                     turn_progress += dx;
 
@@ -167,7 +167,7 @@ if (window.is_view)
                 }
                 if(core.input.left && left_count%10 == 0 && pointer > 0)
                 {
-                    pointer -= 2;
+                    pointer -= 1;
                     turn = log[pointer].turn;
                     turn_progress -= dx;
                     preved_flag = true;
@@ -184,7 +184,7 @@ if (window.is_view)
                 }
                 if (play_flag && play_count%10 == 0 && pointer < log.length - 1)
                 {
-                    pointer += 2;
+                    pointer += 1;
                     turn = log[pointer].turn;
                     turn_progress += dx;
                     MapView();
@@ -200,7 +200,7 @@ if (window.is_view)
                 }
                 if (playrev_flag && playrev_count%10 == 0 && pointer > 0)
                 {
-                    pointer -= 2;
+                    pointer -= 1;
                     turn = log[pointer].turn;
                     turn_progress -= dx;
                     MapView();
