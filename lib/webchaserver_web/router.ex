@@ -27,9 +27,9 @@ defmodule WebchaserverWeb.Router do
   scope "/", WebchaserverWeb do
     pipe_through([:browser, :require_authenticated_user])
 
+    get("/mymatch", PageController, :mymatch)
     get("/test", PageController, :test)
     get("/gettoken", PageController, :gettoken)
-    get("/mymatch", PageController, :mymatch)
     get("viewmatch/:match_id", PageController, :viewmatch)
     get("/creatematch", PageController, :creatematch)
   end
