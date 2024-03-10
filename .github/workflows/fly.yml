@@ -7,7 +7,7 @@ on:
       - ".gitignore"
       - ".gitattributes"
       - ".github/workflow/ci.yml"
-    branch:
+    branches:
       - main
 
 jobs:
