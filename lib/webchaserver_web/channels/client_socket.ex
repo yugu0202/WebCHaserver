@@ -11,6 +11,7 @@ defmodule WebchaserverWeb.ClientSocket do
   # pointing to the `WebchaserverWeb.RoomChannel`:
   #
   channel("match:*", WebchaserverWeb.MatchChannel)
+  channel("client:*", WebchaserverWeb.ClientChannel)
   #
   # To create a channel file, use the mix task:
   #

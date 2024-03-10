@@ -10,18 +10,12 @@ defmodule WebchaserverWeb.MatchChannel do
 
   @impl true
   def join("match:" <> subtopic, _payload, socket) do
-    if authorized?(socket.assigns.user_id, subtopic) do
-      send(self(), :after_join)
-      %{id: register_id} = Userclients.get_userclient_by_user_id(socket.assigns.user_id)
-
-      %{id: first_register_id} = Userclients.get_userclient_by_subtopic(subtopic)
-      if register_id == first_register_id do
-        {:ok, assign(socket, :player, "cool")}
-      else
-        {:ok, assign(socket, :player, "hot")}
-      end
-    else
-      {:error, %{reason: "unauthorized"}}
+    case authorized?(socket.assigns.user_id, subtopic) do
+      {:ok, player} ->
+        send(self(), :after_join)
+        {:ok, assign(socket, :player, player)}
+      {:error, _} ->
+        {:error, %{reason: "unauthorized"}}
     end
   end
 
@@ -159,17 +153,15 @@ defmodule WebchaserverWeb.MatchChannel do
       {:noreply, socket}
   end
 
-  defp authorized?(id, subtopic) do
-      IO.puts "id: #{id}"
+  defp authorized?(user_id, subtopic) do
+      IO.puts "id: #{user_id}"
 
-      %{subtopic: sub} = Userclients.get_userclient_by_user_id(id)
+      %{match_id: match_id, player: player} = Usermatchs.get_usermatch_by_user_id_not_end(user_id)
 
-      IO.puts "sub: #{sub}"
-
-      if sub == subtopic do
-        true
+      if Integer.to_string(match_id) == subtopic do
+        {:ok, player}
       else
-        false
+        {:error, %{reason: "unauthorized"}}
       end
   end
 end
