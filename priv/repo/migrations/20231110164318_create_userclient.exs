@@ -5,7 +5,6 @@ defmodule Webchaserver.Repo.Migrations.CreateUserclient do
     create table(:userclient) do
       add(:user_id, :integer)
       add(:subtopic, :string)
-      add(:locked, :boolean)
 
       timestamps()
     end
