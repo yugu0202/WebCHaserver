@@ -54,7 +54,7 @@ defmodule Webchaserver.MatchMakingWorker do
           D:0,2,0,2,2,2,0,2,0,2,2,0,2,2,3
           D:0,0,0,0,0,0,0,0,3,0,3,0,3,0,0"
           |> String.replace(["D:", " "], "") #とりあえずサンプルデータとして成形
-          |> String.split("\r\n")
+          |> String.split(["\r\n", "\n"])
           |> Enum.map(&String.split(&1, ","))
           |> Enum.flat_map(&(&1))
           |> Enum.map(&String.to_integer(&1))
