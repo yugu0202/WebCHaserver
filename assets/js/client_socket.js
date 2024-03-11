@@ -70,7 +70,7 @@ if (connectButton) {
     console.log("connect");
     topic = actionInput.value;
     actionInput.value = "";
-    channel = socket.channel("match:"+topic);
+    channel = socket.channel("client:"+topic);
     channel
       .join()
       .receive("ok", (resp) => {

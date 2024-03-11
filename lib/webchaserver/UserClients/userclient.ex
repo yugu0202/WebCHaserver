@@ -5,6 +5,7 @@ defmodule Webchaserver.Userclients.Userclient do
   schema "userclient" do
     field :user_id, :integer
     field :subtopic, :string
+    field :locked, :boolean
 
     timestamps()
   end
@@ -12,7 +13,7 @@ defmodule Webchaserver.Userclients.Userclient do
   @doc false
   def changeset(userclient, attrs) do
     userclient
-    |> cast(attrs, [:user_id, :subtopic])
-    |> validate_required([:user_id, :subtopic])
+    |> cast(attrs, [:user_id, :subtopic, :locked])
+    |> validate_required([:user_id, :subtopic, :locked])
   end
 end

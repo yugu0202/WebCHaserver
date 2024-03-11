@@ -57,6 +57,10 @@ defmodule Webchaserver.Userclients do
     Repo.all(from u in Userclient, order_by: [desc: u.id], limit: 2)
   end
 
+  def get_userclient_older_not_lock() do
+    Repo.one(from u in Userclient, where: false == u.locked, order_by: [asc: u.id], limit: 1)
+  end
+
   def get_userclient_by_subtopic(subtopic) do
     Repo.one(from u in Userclient, where: ^subtopic == u.subtopic, order_by: [asc: u.id], limit: 1)
   end

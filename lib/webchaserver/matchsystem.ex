@@ -324,8 +324,8 @@ defmodule Webchaserver.Matchsystem do
     before_player = log.player
 
     cond do
-      before_action == "matching" and player == "cool" and action == "getready" -> true
-      before_action == "matching" and player == "hot" -> false
+      before_action == "match" and player == "cool" and action == "getready" -> true
+      before_action == "match" and player == "hot" -> false
 
       player == before_player and before_action == "getready" and action != "getready" -> true
       player != before_player and before_action != "getready" and action == "getready" -> true
