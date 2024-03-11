@@ -70,7 +70,7 @@ if (connectButton) {
     console.log("connect");
     topic = actionInput.value;
     actionInput.value = "";
-    channel = socket.channel("client:"+topic);
+    channel = socket.channel(topic);
     channel
       .join()
       .receive("ok", (resp) => {
@@ -85,6 +85,10 @@ if (connectButton) {
     });
 
     channel.on("ready", (payload) => {
+      console.log(payload);
+    });
+
+    channel.on("match", (payload) => {
       console.log(payload);
     });
 
