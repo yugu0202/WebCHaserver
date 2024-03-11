@@ -47,52 +47,12 @@ defmodule WebchaserverWeb.MatchChannel do
       {_, 1} ->
         {:stop, :shutdown, socket}
       {"matching", 2} ->
-        users = Enum.map(Presence.list(socket), fn(x) -> Kernel.elem(x, 0) end)
-
-        unless Usermatchs.exist_usermatch_by_user_id_not_end(hd(users)) do
-          size = [15,17]
-          turn = 100
-          cool_pos = [0,0]
-          hot_pos = [14,16]
-          mapdata =
-            "D:0,0,3,0,3,0,3,0,0,0,0,0,0,0,0
-            D:3,2,2,0,2,2,0,2,0,2,2,2,0,2,0
-            D:0,0,3,0,3,2,3,0,3,2,0,3,0,3,0
-            D:0,2,0,2,0,2,0,2,0,0,0,2,2,2,0
-            D:0,2,3,2,3,2,3,2,3,2,0,3,0,3,0
-            D:0,2,0,2,0,2,0,2,0,0,0,2,2,2,0
-            D:0,0,3,0,3,0,3,0,3,2,0,3,0,3,0
-            D:0,2,2,0,2,0,2,2,0,2,0,2,0,2,0
-            D:0,0,0,0,0,0,0,3,0,0,0,0,0,0,0
-            D:0,2,0,2,0,2,0,2,2,0,2,0,2,2,0
-            D:0,3,0,3,0,2,3,0,3,0,3,0,3,0,0
-            D:0,2,2,2,0,0,0,2,0,2,0,2,0,2,0
-            D:0,3,0,3,0,2,3,2,3,2,3,2,3,2,0
-            D:0,2,2,2,0,0,0,2,0,2,0,2,0,2,0
-            D:0,3,0,3,0,2,3,0,3,2,3,0,3,0,0
-            D:0,2,0,2,2,2,0,2,0,2,2,0,2,2,3
-            D:0,0,0,0,0,0,0,0,3,0,3,0,3,0,0"
-            |> String.replace(["D:", " "], "") #とりあえずサンプルデータとして成形
-            |> String.split("\n")
-            |> Enum.map(&String.split(&1, ","))
-            |> Enum.flat_map(&(&1))
-            |> Enum.map(&String.to_integer(&1))
-            |> Enum.chunk_every(Enum.at(size, 0))
-
-          {:ok, %{id: id}} = Matchs.create_match(%{map: mapdata, cool_pos: cool_pos, hot_pos: hot_pos, size: size, turn: turn})
-          Logs.create_log(%{match_id: id, player: "cool", action: "matching", return: [], map_data: mapdata, map_size: size,turn: turn, cool_pos: cool_pos, hot_pos: hot_pos, cool_score: 0, hot_score: 0})
-
-          %{id: register_id} = Userclients.get_userclient_by_user_id(hd(users))
-
-          %{id: first_register_id} = Userclients.get_userclient_by_subtopic(String.replace(socket.topic, "match:", ""))
-
-          if register_id == first_register_id do
-            Usermatchs.create_usermatch2(%{user_id: hd(users), match_id: id, player: "cool"}, %{user_id: Enum.at(users, 1), match_id: id, player: "hot"})
-          else
-            Usermatchs.create_usermatch2(%{user_id: hd(users), match_id: id, player: "hot"}, %{user_id: Enum.at(users, 1), match_id: id, player: "cool"})
+        if Usermatchs.exist_usermatch_by_user_id_not_end(socket.assigns.user_id) do
+          %{match_id: id} = Usermatchs.get_usermatch_by_user_id_not_end(socket.assigns.user_id)
+          case Logs.get_log_by_match_id_latest(id) do
+            %{action: "match"} ->
+              broadcast(socket, "ready", %{data: "cool"})
           end
-
-          broadcast(socket, "ready", %{data: "cool"})
         end
 
         {:noreply, socket}
@@ -101,8 +61,9 @@ defmodule WebchaserverWeb.MatchChannel do
           {:stop, :shutdown, socket}
         else
           player = socket.assigns.player
+          IO.puts "player: #{player}"
           %{match_id: id} = Usermatchs.get_usermatch_by_user_id_not_end(socket.assigns.user_id)
-          log = Logs.get_log_by_match_id(id)
+          log = Logs.get_log_by_match_id_latest(id)
           {ret, is_end} = Matchsystem.action(id, player, action, log)
 
           unless action == "getready" do
@@ -120,7 +81,8 @@ defmodule WebchaserverWeb.MatchChannel do
             Userclients.delete_userclient_by_subtopic(String.replace(socket.topic, "match:", ""))
           end
 
-          {:reply,{:ok, %{data: ret}}, socket}
+          IO.puts "ret: #{inspect(ret)}"
+          {:reply, {:ok, %{data: ret}}, socket}
         end
     end
   end
@@ -148,7 +110,6 @@ defmodule WebchaserverWeb.MatchChannel do
       Presence.track(socket, socket.assigns.user_id , %{
         online_at: System.system_time(:second) |> inspect(),
       })
-
 
       {:noreply, socket}
   end

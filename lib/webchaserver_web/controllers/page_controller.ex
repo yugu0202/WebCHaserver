@@ -58,38 +58,9 @@ defmodule WebchaserverWeb.PageController do
 
     current_user = conn.assigns[:current_user]
 
-    user = Userclients.get_userclient_by_user_id(current_user.id)
-
-    IO.inspect(user)
-
     token = Phoenix.Token.sign(conn, "user", current_user.id)
 
-    subtopic =
-      if user == nil do
-        userclient = Userclients.get_userclient_latest2()
-        subtopic =
-        case userclient |> length do
-          0 ->
-            "1"
-          1 ->
-            hd(userclient).subtopic
-          2 ->
-            [first | second] = userclient
-            second = hd(second)
-            if first.subtopic == second.subtopic do
-              String.to_integer(first.subtopic) + 1 |> Integer.to_string()
-            else
-              first.subtopic
-            end
-        end
-
-        Userclients.create_userclient(%{user_id: current_user.id, subtopic: subtopic})
-        subtopic
-      else
-        user.subtopic
-      end
-
-    render(assign(conn, :user_token, token), :gettoken, layout: false, subtopic: subtopic)
+    render(assign(conn, :user_token, token), :gettoken, layout: false)
   end
 
   defparams match_filter %{

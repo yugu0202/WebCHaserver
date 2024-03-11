@@ -20,6 +20,7 @@ defmodule Webchaserver.Application do
       WebchaserverWeb.Endpoint,
       # Start a worker by calling: Webchaserver.Worker.start_link(arg)
       # {Webchaserver.Worker, arg}
+      {Webchaserver.MatchMakingWorker, name: Webchaserver.MatchMakingWorker},
       WebchaserverWeb.Presence
     ]
 
