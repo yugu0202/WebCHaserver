@@ -15,13 +15,20 @@ defmodule WebchaserverWeb.ClientChannel do
   @impl true
   def join("client:" <> subtopic, _payload, socket) do
     if authorized?(socket.assigns.user_id, subtopic) do
-      Userclients.get_userclient_by_user_id(socket.assigns.user_id)
-      |> Userclients.update_userclient(%{locked: false})
+      send(self(), :after_join)
 
       {:ok, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
+  end
+
+  @impl true
+  def handle_info(:after_join, socket) do
+    Userclients.get_userclient_by_user_id(socket.assigns.user_id)
+    |> Userclients.update_userclient(%{locked: false})
+
+    {:noreply, socket}
   end
 
   defp authorized?(id, subtopic) do
